@@ -10,11 +10,13 @@ body{
     line-height: 600px;
     display: block;
     position: absolute;
+    top: 0;
+    z-index: 101;
     left: 0;
     right: 0;
     width: 100%;
     height: 100%;
-    color: white;
+    color: black;
     background: rgba(255, 255, 255, .5);
 }
 
