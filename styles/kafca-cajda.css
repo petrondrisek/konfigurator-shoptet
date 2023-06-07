@@ -192,7 +192,7 @@ body{
         grid-template-columns: 1fr;
     }
 
-    .konfigurator__chut, .konfigurator__aroma, #konfiguratorResults, .konfigurator__mleti, .konfigurator__image, .konfigurator__velikost, .konfigurator__customText{
+    .konfigurator__chut, .konfigurator__aroma, #konfiguratorResults, .konfigurator__mleti, .konfigurator__customText, .konfigurator__image, .konfigurator__velikost, .konfigurator__customText{
         grid-column: 1;
     }
 
@@ -214,8 +214,12 @@ body{
         grid-row: 5;
     }
 
-    .konfigurator__velikost{
+    .konfigurator__customText{
         grid-row: 6;
+    }
+    
+    .konfigurator__velikost{
+        grid-row: 7;
         grid-template-columns: 1;
     }
     .konfigurator__velikost__item{grid-column: 1;}
