@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-ui-slider@1.12.1/jquery-ui.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" integrity="sha512-cyzxRvewl+FOKTtpBzYjW6x6IAYUCZy3sGP40hn+DQkqeluGRCax7qztK2ImL64SA+C7kVWdLI6wvdlStawhyw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="../styles/global.css">
+    <link rel="stylesheet" type="text/css" href="../styles/kafca-cajda.css">
+    <link rel="stylesheet" type="text/css" href="../styles/konfigurator-produkt.css">
+</head>
+<body>
+    <div class="container">
+    <div id="konfigurator">
+
+        <div id="konfiguratorResults">
+
+        </div>
+    </div>
+    <!--<canvas id="canvas" width="800" height="1192"></canvas>-->
+    <div class="modal fade" id="konfiguratorModal" tabindex="-1" role="dialog" aria-labelledby="konfiguratorModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Konfigurator</h5>
+              <button type="button" class="close" data-dismiss="konfiguratorModal" onclick="$('#'+$(this).attr('data-dismiss')).modal('hide');" aria-label="Zavřít">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+
+            </div>
+            <div class="modal-footer">
+
+            </div>
+          </div>
+        </div>
+    </div>
+    <button class="btn btn-primary" onclick='editImage(8/9, "productImage", "konfigurator__image")'>Upravit obrázek</button>
+  </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-ui-slider@1.12.1/jquery-ui.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js" integrity="sha512-6lplKUSl86rUVprDIjiW8DuOniNX8UDoRATqZSds/7t6zCQZfaCe3e5zcGaQwxa8Kpn5RTM9Fvl3X2lLV4grPQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="../scripts/konfigurator.js"></script>
+    <script>
+        var settings = {
+          "SelectedOptionRelationHideOption": {
+          }
+        };
+        var createKonfigurator = [
+          {
+            "type": "rangeHorizontal",
+            "inputName": "chut", //inputName a zároveň columnname
+            "title": "Chuť kávy",
+            "description": "<img src=\"../defaultImages/chut_kavy.png\" alt=\"obrazek\">",
+            "className": "konfigurator__chut",
+            "colors": [
+              "000", //Default, když není vidět - 0%
+              "bf4d27", 
+              "bb4d28", 
+              "b54c29", 
+              "ae4c2a", 
+              "a64b2c", 
+              "9e4b2d", 
+              "954a2f", 
+              "8d4931", 
+              "844832", 
+              "7c4733", 
+              "744735", 
+              "6d4735", 
+              "684537", 
+              "624537"
+            ],
+            "tooltip":"Pohybem posuvníku si vyberte chuť své kávy."
+          },
+          {
+            "type": "rangeHorizontal",
+            "inputName": "aroma", //inputName a zároveň columnname
+            "title": "Aroma kávy",
+            "description": "<img src=\"../defaultImages/aroma_kavy.png\" alt=\"obrazek\">",
+            "className": "konfigurator__aroma",
+            "colors": [
+              "000", //Default, když není vidět - 0%
+              "1ca087", 
+              "209c84", 
+              "269780", 
+              "2c927b", 
+              "338c76", 
+              "3a8670", 
+              "437f6a", 
+              "4b7864", 
+              "527260", 
+              "5a6b5a", 
+              "616554", 
+              "686050", 
+              "6e5b4b", 
+              "715749"
+            ],
+            "tooltip":"Stejným způsobem si můžete zvolit i aroma vaší kávy."
+          },
+          {
+            "type": "select",
+            "inputName": "mleti",
+            "title": "Způsob mletí",
+            "className": "konfigurator__mleti",
+            "optionImages": true,
+            "optionAliases": [
+              "<span class=\"mainTitle\">Celá zrná</span><small>nemletá</small>", 
+              "<span class=\"mainTitle\">Překapávaná</span><small>hrubá</small>", 
+              "<span class=\"mainTitle\">French press</span><small>velmi hrubá</small>", 
+              "<span class=\"mainTitle\">Espresso</span><small>střední</small>", 
+              "<span class=\"mainTitle\">Moka</span><small>střední</small>", 
+              "<span class=\"mainTitle\">Turek</span><small>jemná</small>"
+            ],
+            "tooltip": ""
+          },
+          {
+            "type": "select",
+            "inputName": "velikost",
+            "title": "Velikost balení",
+            "className": "konfigurator__velikost",
+            "optionImages": false,
+            "optionAliases": [
+              "250 G",
+              "500 G",
+              "1000 G"
+            ],
+            "tooltip": ""
+          },
+          {
+            "type": "text",
+            "inputName": "customText",
+            "title": "Vlastní text",
+            "className": "konfigurator__customText",
+            "defaultText": "Směs kávy<br>100% Arabica",
+            "tooltip": ""
+          },
+          {
+            "type": "image",
+            "inputName": "productImage",
+            "title": "Vlastní obrázek",
+            "className": "konfigurator__image",
+            "stackDefaultImages": [
+              "../defaultImages/864e722ffec887cf10087c038468b76a.jpg",
+              "../defaultImages/48e4b5c124c69244902ddbcaf3a25fc7.png", 
+              "../defaultImages/864e722ffec887cf10087c038468b76a.jpg",
+              "../defaultImages/48e4b5c124c69244902ddbcaf3a25fc7.png", 
+              "../defaultImages/864e722ffec887cf10087c038468b76a.jpg",
+              "../defaultImages/48e4b5c124c69244902ddbcaf3a25fc7.png", 
+              "../defaultImages/864e722ffec887cf10087c038468b76a.jpg",
+            ],
+            "tooltip": ""
+          },
+          {
+            "type": "finalProduct",
+            "id": "finalProduct",
+            "backgroundImage": "../defaultImages/bag.jpg",
+            "etiquette": {
+              "image":"../defaultImages/coffee_etiquette_800x1992.png",
+              "className": "product__etiketa",
+              "customTextSize": 90
+            }
+          }
+        ];
+        
+        //Sloupce v naší tabulce, které se mají zobrazit
+        var resultsColumns = ["kenya", "guatemala", "brasil", "costarica", "colombia", "indonesia"];
+        //Nadpisy - nepovinné (pořadí odpovídá sloupcům)
+        var resultsTitles = ["Kenya AA", "Guatemala Tres Maria SHG", "Brazil Facenda Lagoa", "Costa Rica Tarazzu", "Columbia Excelso", "Indonesia Java"];
+        //Společná jednotka našich parametrů
+        var resultsUnit = "%";
+        //Ukazovat prázdné sloupce výsledků (0 g, 0%)
+        var showEmptyResults = true;
+        //Nadpis nad výsledky
+        var resultsTitle = "";
+
+        Konfigurator("./kava.csv", $("#konfigurator"));
+
+
+        setTimeout(function(){
+          var data = {};
+          $(".konfiguratorData").each(function(){
+            data[$(this).attr("id")] = $(this).val();
+          });
+          console.log(data);
+          $.post("https://vyvoj.prezza.cz/kafco-cajda/post.php", JSON.stringify(data),function(data, status){
+            console.log(data, status);
+          });
+        }, 500);
+
+    </script>
+    <script src="../scripts/kafco-cajda-canvas.js"></script>
+</body>
+</html>
