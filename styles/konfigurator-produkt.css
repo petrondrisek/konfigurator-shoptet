@@ -32,5 +32,11 @@
 
     .konfigurator__product__content{
         margin: auto;
+        width: 300px;
+        height: 483.82px;
+    }
+
+    .product__etiketa{
+        width: 212.135px;
     }
 }
