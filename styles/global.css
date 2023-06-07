@@ -21,7 +21,7 @@ body{
 /*Tooltip*/
 .tooltip-toggle{
     position: absolute;
-    z-index: 10000;
+    z-index: 99;
     top: .6rem;
     right: .6rem;
     background: black;
@@ -36,7 +36,7 @@ body{
 .tooltip-toggle-bar{
     display: none;
     position: absolute;
-    z-index: 10000;
+    z-index: 99;
     top: .6rem;
     right: .6rem;
     background: white;
@@ -198,7 +198,7 @@ body{
     margin: auto;
     background: transparent;
     border: 0 !important;
-    z-index: 100;
+    z-index: 99;
     width: 100%;
 }
 
