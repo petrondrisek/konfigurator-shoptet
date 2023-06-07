@@ -42,7 +42,7 @@ function baseSetting(area, settings){
 function konfiguratorCreate(area, dataValues, theme){
     for(let i = 0; i < theme.length; i++){
         if(theme[i].type === "rangeHorizontal"){
-          rangeFrom(area, dataValues, theme[i].inputName, theme[i].title, theme[i].description, theme[i].className, theme[i].colors, theme[i].toolltip);
+          rangeFrom(area, dataValues, theme[i].inputName, theme[i].title, theme[i].description, theme[i].className, theme[i].colors, theme[i].tooltip);
         }
         if(theme[i].type === "select"){
           selectFrom(area, dataValues, theme[i].inputName, theme[i].title, theme[i].className, theme[i].optionImages, theme[i].optionAliases, theme[i].tooltip);
