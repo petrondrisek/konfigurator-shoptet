@@ -404,7 +404,7 @@ function finalProductGenerate(area, id, backgroundImage, etiquette, update = fal
     
     if(update === false){
         if(typeof generateImage === "function"){
-            htmlInsert += "<div class=\"konfigurator__product\"><input type=\"hidden\" id=\"finalProduct\" class=\"konfiguratorData\" value=\""+etiquette.image+"\"><div class=\"konfigurator__product__content\"><img src=\""+backgroundImage+"\" class=\"product__background\" alt=\"Produkt\"><img src=\""+etiquette.image+"\" width=\"266px\" alt=\"Etiketa\" class=\""+etiquette.className+"\"></div></div>";
+            htmlInsert += "<div class=\"konfigurator__product--open\" onclick=\"$(this).parent().find('.konfigurator__product').show()\">&#8594;</div><div class=\"konfigurator__product\"><div class=\"konfigurator__product--close\" onclick=\"$(this).parent().hide()\">&times;</div><input type=\"hidden\" id=\"finalProduct\" class=\"konfiguratorData\" value=\""+etiquette.image+"\"><div class=\"konfigurator__product__content\"><img src=\""+backgroundImage+"\" class=\"product__background\" alt=\"Produkt\"><img src=\""+etiquette.image+"\" width=\"266px\" alt=\"Etiketa\" class=\""+etiquette.className+"\"></div></div>";
             if(blockGenerating === false){
                 blockGenerating = true;
                 $(".konfigurator__product__content").addClass("loading");
