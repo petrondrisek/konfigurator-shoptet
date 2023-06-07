@@ -268,7 +268,7 @@ function textInput(area, name, title, className, defaultValue = ""){
     return area.html(area.html() + htmlInsert);
 }
 function textInputKeyDown(event, element){
-    var blockedKeyCodes = [8, 9, 13, 16, 17, 18, 20, 27, 33, 34, 35, 36, 45, 46, 91, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 144];
+    var blockedKeyCodes = [8, 9, 13, 16, 17, 18, 20, 27, 33, 34, 35, 36, 45, 46, 91, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 144, 229];
     $(element).attr('data-values', (event.keyCode === 8 ? $(element).val().slice(0, $(element).val().length-1) : $(element).val())+(blockedKeyCodes.includes(event.keyCode) ? '' : event.key));
     changeValue(element);
 }

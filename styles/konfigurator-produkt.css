@@ -45,6 +45,7 @@
 
     .konfigurator__product--open{
         position: fixed;
+        z-index: 99;
         right: 1rem;
         bottom: 1rem;
         font-size: 2rem;
@@ -56,6 +57,7 @@
         line-height: 1.8rem;
         text-align: center;
         border-radius: 100%;
+        cursor: pointer;
     }
 
     .konfigurator__product--close{
@@ -72,6 +74,7 @@
         line-height: 1.8rem;
         text-align: center;
         border-radius: 100%;
+        cursor: pointer;
     }
 
     .konfigurator__product__content{
