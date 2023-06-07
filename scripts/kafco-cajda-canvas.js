@@ -7,7 +7,7 @@ function generateImage(area, product, etiquette){
     var canvas = null;
 
     background.onload = function(){
-      area.append("<canvas id=\"canvas\" width=\""+background.width+"\" height=\""+background.height+"\" style=\"display:none\"></canvas>")
+      if(!$("#canvas").length) area.append("<canvas id=\"canvas\" width=\""+background.width+"\" height=\""+background.height+"\" style=\"display:none\"></canvas>")
       canvas = document.getElementById("canvas");
       const ctx = canvas.getContext("2d");
 

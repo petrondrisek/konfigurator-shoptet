@@ -136,6 +136,11 @@ body{
     grid-column: 1 / span 2;
 }
 
+.konfiguratorAmount{
+    grid-row: 7;
+    grid-column: 1 / span 2;
+}
+
 /*Nastavení jednoselektorů*/
 .konfigurator__velikost, .konfigurator__mleti{
     display: grid;
@@ -192,7 +197,7 @@ body{
         grid-template-columns: 1fr;
     }
 
-    .konfigurator__chut, .konfigurator__aroma, #konfiguratorResults, .konfigurator__mleti, .konfigurator__customText, .konfigurator__image, .konfigurator__velikost, .konfigurator__customText{
+    .konfigurator__chut, .konfigurator__aroma, #konfiguratorResults, .konfigurator__mleti, .konfigurator__customText, .konfiguratorAmount, .konfigurator__image, .konfigurator__velikost, .konfigurator__customText{
         grid-column: 1;
     }
 
@@ -221,6 +226,10 @@ body{
     .konfigurator__velikost{
         grid-row: 7;
         grid-template-columns: 1;
+    }
+
+    .konfiguratorAmount{
+        grid-row: 8;
     }
     .konfigurator__velikost__item{grid-column: 1;}
 }

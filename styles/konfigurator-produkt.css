@@ -35,6 +35,10 @@
         display: none;
     }
 
+    .konfigurator__product.show{
+        display: block;
+    }
+
     .konfigurator__product--open, .konfigurator__product--close{
         display: block;
     }
