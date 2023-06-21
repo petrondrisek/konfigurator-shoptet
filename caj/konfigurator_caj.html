@@ -253,19 +253,17 @@
               "className": "product__etiketa",
               "customTextSize": 90
             }
+          },
+          {
+            "type": "results",
+            "title": "Poměr chuti",
+            "id": "konfiguratorResults",
+            "columns": ["zaklad_g", "prisada_1g", "prisada_2g"],
+            "unit": "g",
+            "columnAliases": ["Základ", "Přísada 1", "Přísada 2"],
+            "showEmptyResults": false
           }
-        ]
-        
-        //Sloupce v naší tabulce, které se mají zobrazit
-        var resultsColumns = ["zaklad_g", "prisada_1g", "prisada_2g"];
-        //Nadpisy - nepovinné (pořadí odpovídá sloupcům)
-        var resultsTitles = ["Základ", "Přísada 1", "Přísada 2"];
-        //Společná jednotka našich parametrů
-        var resultsUnit = "g";
-        //Ukazovat prázdné sloupce výsledků (0 g, 0%)
-        var showEmptyResults = false;
-        //Nadpis nad výsledky
-        var resultsTitle = "Poměr chuti";
+        ];
 
         Konfigurator("./caj.csv", $("#konfigurator"));
     </script>

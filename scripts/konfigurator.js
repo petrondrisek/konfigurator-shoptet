@@ -1,7 +1,14 @@
 /*jshint esversion: 6 */
 /*Pomocné proměnné*/
-var blockGenerating = false;
-var selectedProduct = null;
+let blockGenerating = false;
+let selectedProduct = null;
+//Results
+let resultsColumns = [];
+let resultsTitles = [];
+let resultsUnit = "";
+let showEmptyResults = true;
+let resultsTitle = "";
+let resultsArea = "";
 
 /*Pomocné funkce*/
 function startsWithInArray(array, find) {
@@ -15,9 +22,9 @@ function startsWithInArray(array, find) {
 }
 //Funkce pro unikátní výběr
 function selectDistinct(array) {
-    var includes = [];
-    for (let i = 0; i < array.length; i++){
-        if(!includes.includes(array[i])) includes.push(array[i]);
+    let includes = [];
+    for(let item of array){
+        if(!includes.includes(item)) includes.push(item);
     }
 
     return includes;
@@ -26,12 +33,13 @@ function selectDistinct(array) {
 /*Základ*/
 //BaseSetting - skrytí při selected value
 function baseSetting(area, settings){
-    var htmlInsert = "";
+    let htmlInsert = "";
     for(let i of Object.keys(settings)){
         if(i === "SelectedOptionRelationHideOption"){
             htmlInsert+="<style>";
             for(let j of Object.keys(settings[i]))
-                for(let k = 0; k < settings[i][j].length; k++) htmlInsert+="#"+area.attr("id")+":has(> [data-selected='"+j+"']) [data-values='"+settings[i][j][k]+"']{ display: none }";
+                for(let k of settings[i][j]) 
+                    htmlInsert+="#"+area.attr("id")+":has(> [data-selected='"+j+"']) [data-values='"+k+"']{ display: none }";
             htmlInsert+="</style>";
         }
     }
@@ -40,29 +48,39 @@ function baseSetting(area, settings){
 }
 //Z JSONu vytvoří konfigurátor
 function konfiguratorCreate(area, dataValues, theme){
-    for(let i = 0; i < theme.length; i++){
+    for(let i in theme){
         if(theme[i].type === "rangeHorizontal"){
           rangeFrom(area, dataValues, theme[i].inputName, theme[i].title, theme[i].description, theme[i].className, theme[i].colors, theme[i].tooltip);
         }
-        if(theme[i].type === "select"){
+        else if(theme[i].type === "select"){
           selectFrom(area, dataValues, theme[i].inputName, theme[i].title, theme[i].className, theme[i].optionImages, theme[i].optionAliases, theme[i].tooltip);
         }
-        if(theme[i].type === "multipleSelect"){
-            selectFromMultiple(area, dataValues, theme[i].inputNames, theme[i].title, theme[i].inputTitles, theme[i].className, theme[i].inputClassNames, theme[i].optionImages, theme[i].inputOptionAliases, theme[i].optionRepeat, theme[i].tooltip);
+        else if(theme[i].type === "multipleSelect"){
+          selectFromMultiple(area, dataValues, theme[i].inputNames, theme[i].title, theme[i].inputTitles, theme[i].className, theme[i].inputClassNames, theme[i].optionImages, theme[i].inputOptionAliases, theme[i].optionRepeat, theme[i].tooltip);
         }
-        if(theme[i].type === "text"){
+        else if(theme[i].type === "text"){
           textInput(area, theme[i].inputName, theme[i].title, theme[i].className, theme[i].defaultText);
         }
-        if(theme[i].type === "image"){
+        else if(theme[i].type === "image"){
           fullImageArea(area, theme[i].inputName, theme[i].title, theme[i].className, theme[i].stackDefaultImages, theme[i].tooltip);
         }
-        if(theme[i].type === "finalProduct"){
+        else if(theme[i].type === "finalProduct"){
           selectedProduct = dataValues[0];
           finalProductGenerate(area, theme[i].id, theme[i].backgroundImage, theme[i].etiquette);
         }
-        if(theme[i].type === "amount"){
+        else if(theme[i].type === "amount"){
             amountInput(area, theme[i].title, theme[i].className);
-          }
+        }
+        else if(theme[i].type === "results"){
+            resultsColumns = theme[i].columns;
+            resultsTitles = theme[i].columnAliases;
+            resultsUnit = theme[i].unit;
+            showEmptyResults = theme[i].showEmptyResults;
+            resultsTitle = theme[i].title;
+            resultsArea = theme[i].id;
+            area.append("<div id=\""+resultsArea+"\"></div>");
+            showResults($("#"+resultsArea), resultsTitle, dataValues[0], false, 0, showEmptyResults);
+        }
       }
 }
 //Nejzákladnější funkce volaná ze stránky
@@ -76,7 +94,7 @@ function Konfigurator(csvFileURL, area){
             if (type.indexOf("text") !== 1) {
                 //Načtení dat z CSV
                 let data = String(request.responseText).split(/\r?\n/);
-                //Variable `dataValues`, který nese array všech hodnot
+                //letiable `dataValues`, který nese array všech hodnot
                 let dataValues = [];
                 let head  = data[0].split(";");
                 for(let i = 1; i < data.length; i++){
@@ -144,12 +162,12 @@ function Konfigurator(csvFileURL, area){
                     //TextInput font size
                     $(".fontPlus").each(function(){
                         $(this).unbind().click(function(){
-                            addFontSize(this);
+                            addFontSize();
                         });
                     });
                     $(".fontMinus").each(function(){
                         $(this).unbind().click(function(){
-                            minusFontSize(this);
+                            minusFontSize();
                         });
                     });
                     //Aktivování range sliderů
@@ -184,9 +202,9 @@ function konfiguratorChange(data, showResultsView = true){
     const htmlDoc = parser.parseFromString(body, 'text/html');
     let konfiguratorData = $(htmlDoc).find(".konfiguratorData");
     
-    for(let i = 0; i < konfiguratorData.length;i++){
-        keys.push($(konfiguratorData[i]).attr("id"));
-        values.push($(konfiguratorData[i]).attr("value"));
+    for(let i of konfiguratorData){
+        keys.push($(i).attr("id"));
+        values.push($(i).attr("value"));
     }
 
     let product = -1;
@@ -206,7 +224,7 @@ function konfiguratorChange(data, showResultsView = true){
     if(showResultsView){
         if(product >= 0 && data[product].produkt !== "0"){
             $("#konfigurator").attr("productID", product);
-            showResults($("#konfiguratorResults"), resultsTitle, data[product], true, 0, showEmptyResults);
+            showResults($("#"+resultsArea), resultsTitle, data[product], true, 0, showEmptyResults);
         }else{
             $("#konfiguratorResults").html("<div class=\"resultNull\">Vybraným parametrům neodpovídá žádný produkt</div>");
         }
@@ -236,7 +254,7 @@ function changeValue(element){
 }
 //Zobrazení výsledků
 function showResults(area, title, product, update, defaultValue, showNull = true){
-    var htmlInsert = "<h2>"+title+"</h2><div class=\"konfiguratorProductResults\">";
+    let htmlInsert = "<h2>"+title+"</h2><div class=\"konfiguratorProductResults\">";
     for(let i = 0; i < resultsColumns.length; i++){
         if(showNull === false && product[resultsColumns[i]] !== '0') htmlInsert += "<div class=\"konfiguratorProductResults__item\"><p class=\"konfiguratorProductResults__item__value\">"+(product[resultsColumns[i]] === undefined ? defaultValue : product[resultsColumns[i]])+" "+resultsUnit+"</p><p class=\"konfiguratorProductResults__item__title\" data-column=\""+resultsColumns[i]+"\">"+(resultsTitles[i] === undefined ? resultsColumns[i] : resultsTitles[i])+"</p></div>";
         else if(showNull === true) htmlInsert += "<div class=\"konfiguratorProductResults__item\"><p class=\"konfiguratorProductResults__item__value\">"+(product[resultsColumns[i]] === undefined ? defaultValue : product[resultsColumns[i]])+" "+resultsUnit+"</p><p class=\"konfiguratorProductResults__item__title\" data-column=\""+resultsColumns[i]+"\">"+(resultsTitles[i] === undefined ? resultsColumns[i] : resultsTitles[i])+"</p></div>";
@@ -257,18 +275,18 @@ function showResults(area, title, product, update, defaultValue, showNull = true
 /*Selectory*/
 //Amount
 function amountInput(area, title, className){
-    var htmlInsert = "<div class=\"konfiguratorAmount konfiguratorChangeable "+className+"\"><h2>"+title+"</h2><input type=\"number\" id=\"amount\" class=\"konfiguratorData\" value=\"1\"></div>";
+    let htmlInsert = "<div class=\"konfiguratorAmount konfiguratorChangeable "+className+"\"><h2>"+title+"</h2><input type=\"number\" id=\"amount\" class=\"konfiguratorData\" value=\"1\"></div>";
 
     area.html(area.html() + htmlInsert);
 }
 //Textový selektor
 function textInput(area, name, title, className, defaultValue = ""){
-    var htmlInsert = "<div class=\"konfiguratorText "+className+" konfiguratorChangeable\"><h2>"+title+"</h2><input type=\"text\" data-change=\""+name+"\" onkeydown=\"textInputKeyDown(event, this)\"><input type=\"hidden\" name=\""+name+"\" id=\""+name+"\" value=\""+defaultValue+"\" class=\"konfiguratorData\"><button class=\"fontPlus\" data-textInput=\""+name+"\">+</button><button class=\"fontMinus\" data-textInput=\""+name+"\">-</button></div>";
+    let htmlInsert = "<div class=\"konfiguratorText "+className+" konfiguratorChangeable\"><h2>"+title+"</h2><input type=\"text\" data-change=\""+name+"\" onkeydown=\"textInputKeyDown(event, this)\"><input type=\"hidden\" name=\""+name+"\" id=\""+name+"\" value=\""+defaultValue+"\" class=\"konfiguratorData\"><button class=\"fontPlus\" data-textInput=\""+name+"\">+</button><button class=\"fontMinus\" data-textInput=\""+name+"\">-</button></div>";
 
     return area.html(area.html() + htmlInsert);
 }
 function textInputKeyDown(event, element){
-    var blockedKeyCodes = [8, 9, 13, 16, 17, 18, 20, 27, 33, 34, 35, 36, 45, 46, 91, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 144, 229];
+    let blockedKeyCodes = [8, 9, 13, 16, 17, 18, 20, 27, 33, 34, 35, 36, 45, 46, 91, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 144, 229];
     $(element).attr('data-values', (event.keyCode === 8 ? $(element).val().slice(0, $(element).val().length-1) : $(element).val())+(blockedKeyCodes.includes(event.keyCode) ? '' : event.key));
     changeValue(element);
 }
@@ -286,7 +304,7 @@ function openMultipleSelectStack(element, column){
     $(".multipleSelectFromStack[data-column='"+column+"']").addClass("selectedStackItem");
 }
 function selectFromMultiple(area, data, columns, title, columnTitles, classNameArea, classNamesItems, images = false, itemTitles = [], repeat = false, toolTip=""){
-    var values = [], htmlInsert = "";
+    let values = [], htmlInsert = "";
     htmlInsert += "<div class=\"multipleSelectFrom "+classNameArea+" konfiguratorChangeable\"><h2>"+title+"</h2>";
     htmlInsert += "<div class=\"multipleSelectFrom__selectors\">";
     for(let i = 0; i < columns.length; i++){
@@ -300,8 +318,8 @@ function selectFromMultiple(area, data, columns, title, columnTitles, classNameA
     for(let i = 0; i < columns.length; i++){
         htmlInsert += "<div class=\""+classNamesItems[i]+"__stack multipleSelectFrom__area\">";
         values[i] = [];
-        for(let j = 0; j < data.length; j++){
-            if(data[j].produkt !== "0") values[i].push(data[j][columns[i]]);
+        for(let item of data){
+            if(item.produkt !== "0") values[i].push(item[columns[i]]);
         }
         values[i] = selectDistinct(values[i]);
 
@@ -321,14 +339,14 @@ function selectFromMultiple(area, data, columns, title, columnTitles, classNameA
 //Single selektor
 function selectFrom(area, data, column, title, className, images = false, itemTitles = [], toolTip = ""){
     //Vybereme jednotlivé hodnoty
-    var values = [];
-    for(let i = 0; i < data.length; i++){
-        if(data[i].produkt !== "0") values.push(data[i][column]);
+    let values = [];
+    for(let item of data){
+        if(item.produkt !== "0") values.push(item[column]);
     }
     values = selectDistinct(values);
     
     //Vytvoříme HTML kod
-    var htmlInsert = "<div class=\""+className+" konfiguratorChangeable\" data-selected=\""+values[0]+"\"><h2>"+title+"</h2>";
+    let htmlInsert = "<div class=\""+className+" konfiguratorChangeable\" data-selected=\""+values[0]+"\"><h2>"+title+"</h2>";
     for(let i = 0; i < values.length; i++){
         htmlInsert+="<div class=\"singleSelectItem "+className+"__item "+(i == 0 ? "selectedItem" : "")+"\" data-change=\""+column+"\" data-values=\""+values[i]+"\">"+(images === true ? "<div class=\"optionImage\"><img src=\""+values[i]+".png\" alt=\"Obrazek možnosti\"></div>" : "") + "<p class=\"optionText\">"+(itemTitles === undefined || itemTitles[i] === undefined ? values[i] : itemTitles[i])+"</p></div>";
     }
@@ -341,14 +359,14 @@ function selectFrom(area, data, column, title, className, images = false, itemTi
 //RangeHorinzotal selector
 function rangeFrom(area, data, column, title, desc, className, colors = ["00f"], toolTip = ""){
     //Vybereme jednotlivé hodnoty
-    var values = [];
-    for(let i = 0; i < data.length; i++){
-        if(data[i].produkt !== "0") values.push(data[i][column]);
+    let values = [];
+    for(let item of data){
+        if(item.produkt !== "0") values.push(item[column]);
     }
     values = selectDistinct(values);
 
     //Vytvoříme HTML kod + zapneme slider
-    var htmlInsert = "<div class=\""+className+" konfiguratorChangeable\"><h2>"+title+"</h2>";
+    let htmlInsert = "<div class=\""+className+" konfiguratorChangeable\"><h2>"+title+"</h2>";
     htmlInsert+=tooltip(toolTip);
     htmlInsert+="<div class=\"konfiguratorDescription\">"+desc+"</div>";
     htmlInsert+="<div class=\" konfiguratorRange\"><div class=\"konfiguratorBackground\" data-background=\""+colors.join(";")+"\" style=\"background: #"+(colors[1] !== undefined ? colors[1] : colors[0])+"\"></div><div data-column=\""+column+"\" class=\""+className+"__slider slider\" data-values=\""+values.length+"\"></div></div>";
@@ -361,9 +379,9 @@ function rangeFrom(area, data, column, title, desc, className, colors = ["00f"],
 }
 //Images
 function fullImageArea(area, columnName, title, className, defaultImages = [], toolTip = ""){
-    var upload = uploadImage(className, columnName);
-    var stack = selectImage(className, columnName, defaultImages);
-    var htmlInsert = "<div class=\"konfiguratorChangeable "+className+"\"><h2>"+title+"</h2>";
+    let upload = uploadImage(className, columnName);
+    let stack = selectImage(className, columnName, defaultImages);
+    let htmlInsert = "<div class=\"konfiguratorChangeable "+className+"\"><h2>"+title+"</h2>";
     htmlInsert+=tooltip(toolTip);
     htmlInsert+=upload;
     htmlInsert+="<i>nebo si vyberte z předem nahraných...</i>";
@@ -374,7 +392,7 @@ function fullImageArea(area, columnName, title, className, defaultImages = [], t
 }
 function selectImage(className, columnName, defaultImages = []){
     //Vytvoříme HTML kod
-    var htmlInsert = "<div class=\""+className+" imageStack konfiguratorChangeable\"><div class=\""+className+"__stack imageStackSelect\">";
+    let htmlInsert = "<div class=\""+className+" imageStack konfiguratorChangeable\"><div class=\""+className+"__stack imageStackSelect\">";
     for(let i = 0; i < defaultImages.length; i++){
         htmlInsert+="<div class=\""+className+"__stack__item imageStackItem "+(i==0 ? "selectedItem" : "")+"\" data-change=\""+columnName+"\" data-values=\""+defaultImages[i]+"\"><img src=\""+defaultImages[i]+"\" alt=\"Obrazek\"></div>";
     }
@@ -384,14 +402,14 @@ function selectImage(className, columnName, defaultImages = []){
     return htmlInsert;
 }
 function uploadImage(addToElement, columnName){
-    var htmlInsert = "<div class=\"konfiguratorUploadImage konfiguratorChangeable\">";
+    let htmlInsert = "<div class=\"konfiguratorUploadImage konfiguratorChangeable\">";
     htmlInsert+="<label for=\"upload_"+addToElement+"\" class=\"uploadLabel\">Vložte Váš originální obrázek </label><input type=\"file\" id=\"upload_"+addToElement+"\" onChange=\"addToFileStack('"+addToElement+"', '"+columnName+"', this)\" accept=\"image/*\" style=\"display:none\"></div>";
 
     return htmlInsert;
 }
 function addToFileStack(addTo, columnName, file){
-    var createURL = URL.createObjectURL(file.files[0]);
-    var htmlInsert = "<div class=\""+addTo+"__stack__item imageStackItem\" data-change=\""+columnName+"\" data-values=\""+createURL+"\" onclick=\"changeValue(this)\"><img src=\""+createURL+"\" alt=\"Obrazek\"></div>";
+    let createURL = URL.createObjectURL(file.files[0]);
+    let htmlInsert = "<div class=\""+addTo+"__stack__item imageStackItem\" data-change=\""+columnName+"\" data-values=\""+createURL+"\" onclick=\"changeValue(this)\"><img src=\""+createURL+"\" alt=\"Obrazek\"></div>";
     
     $("."+addTo+"__stack").prepend(htmlInsert);            
     $("[data-values='"+createURL+"']").trigger("click");
@@ -415,7 +433,7 @@ function editImage(aspectRatio, columnName, fileStack){
 
     $("#saveCrop").click(function(){
         cropper.getCroppedCanvas().toBlob((blob) => {
-            var createURL = URL.createObjectURL(blob);
+            let createURL = URL.createObjectURL(blob);
 
             $("."+fileStack+"__stack").prepend("<div class=\""+fileStack+"__stack__item imageStackItem\" data-change=\""+columnName+"\" data-values=\""+createURL+"\" onclick=\"changeValue(this)\"><img src=\""+createURL+"\" alt=\"Obrazek\"></div>");
         
@@ -450,7 +468,7 @@ function tooltip(text){
 
 /*Závěr*/
 function finalProductGenerate(area, id, backgroundImage, etiquette, update = false){
-    var htmlInsert;
+    let htmlInsert = "";
     
     if(update === false){
         if(typeof generateImage === "function"){

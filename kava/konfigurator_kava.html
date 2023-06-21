@@ -15,12 +15,7 @@
 <body>
     <div class="container">
     <div id="konfigurator">
-
-        <div id="konfiguratorResults">
-
-        </div>
     </div>
-    <!--<canvas id="canvas" width="800" height="1192"></canvas>-->
     <div class="modal fade" id="konfiguratorModal" tabindex="-1" role="dialog" aria-labelledby="konfiguratorModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
           <div class="modal-content">
@@ -170,34 +165,33 @@
             "type": "amount",
             "title": "Počet kusů",
             "className": ""
+          },
+          {
+            "type": "results",
+            "title": "",
+            "id": "konfiguratorResults",
+            "columns": [
+              "kenya",
+              "guetamala",
+              "brasil",
+              "costarica",
+              "colombia",
+              "indonesia"
+            ],
+            "unit": "%",
+            "columnAliases": [
+              "Kenya AA",
+              "Guatemala Tres Maria SHG",
+              "Brazil Facenda Lagoa",
+              "Costa Rica Tarazzu",
+              "Columbia Excelso",
+              "Indonesia Java"
+            ],
+            "showEmptyResults": true
           }
         ];
-        
-        //Sloupce v naší tabulce, které se mají zobrazit
-        var resultsColumns = ["kenya", "guatemala", "brasil", "costarica", "colombia", "indonesia"];
-        //Nadpisy - nepovinné (pořadí odpovídá sloupcům)
-        var resultsTitles = ["Kenya AA", "Guatemala Tres Maria SHG", "Brazil Facenda Lagoa", "Costa Rica Tarazzu", "Columbia Excelso", "Indonesia Java"];
-        //Společná jednotka našich parametrů
-        var resultsUnit = "%";
-        //Ukazovat prázdné sloupce výsledků (0 g, 0%)
-        var showEmptyResults = true;
-        //Nadpis nad výsledky
-        var resultsTitle = "";
 
         Konfigurator("./kava.csv", $("#konfigurator"));
-
-
-        /*setTimeout(function(){
-          var data = {};
-          $(".konfiguratorData").each(function(){
-            data[$(this).attr("id")] = $(this).val();
-          });
-          console.log(data);
-          $.post("https://vyvoj.prezza.cz/kafco-cajda/post.php", JSON.stringify(data),function(data, status){
-            console.log(data, status);
-          });
-        }, 500);
-*/
     </script>
     <script src="../scripts/kafco-cajda-canvas.js"></script>
 </body>
