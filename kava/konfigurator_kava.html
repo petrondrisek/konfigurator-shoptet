@@ -156,10 +156,87 @@
             "id": "finalProduct",
             "backgroundImage": "../defaultImages/bag.jpg",
             "etiquette": {
-              "image":"../defaultImages/coffee_etiquette_800x1992.png",
+              "type": "staticImage", //staticImage, columnImage
+              "image": "../defaultImages/coffee_etiquette_800x1992.png", //staticImage - url, dataImage - column from data
               "className": "product__etiketa",
-              "customTextSize": 90
+              "finalRenderWidth": 266
             },
+            "items":[
+            {
+                "type": "image",
+                "inputName": "productImage",
+                "adjustCropTo": "width",
+                "height": 440,
+                "width": 400,
+                "top": 777,
+                "left": 0  
+              },
+              {
+                "type": "text",
+                "inputName": "customText",
+                
+                "width": 600,
+                "top": 650,
+                "left": 400,
+                "adjustPositionLine": true,
+
+                "fontConvert": "uppercase",
+                "fontWeight": "normal",
+                "fontStyle": "Briko Rough",
+                "fontSize": 90,
+                "lineHeight": 90,
+                "fontColor": "#ffffff",
+                "textAlign": "center"
+              },
+              {
+                "type": "data",
+                "columnName": "resultTitle",
+                "top": 800,
+                "left": 600,
+                "width": 300,
+                "adjustPositionLine": false,
+
+                "fontConvert": "none",
+                "fontWeight": "bold",
+                "fontStyle": "Arial",
+                "fontSize": 35,
+                "lineHeight": 50,
+                "fontColor": "#ffffff",
+                "textAlign": "center"
+              },
+              {
+                "type": "data",
+                "columnName": "resultDesc",
+                "top": 900,
+                "left": 600,
+                "width": 300,
+                "adjustPositionLine": false,
+
+                "fontConvert": "none",
+                "fontWeight": "normal",
+                "fontStyle": "Arial",
+                "fontSize": 25,
+                "lineHeight": 30,
+                "fontColor": "#ffffff",
+                "textAlign": "center"
+              },
+              {
+                "type": "data",
+                "columnName": "velikost",
+                "top": 1150,
+                "left": 600,
+                "width": 300,
+                "adjustPositionLine": false,
+
+                "fontConvert": "none",
+                "fontWeight": "bold",
+                "fontStyle": "Arial",
+                "fontSize": 35,
+                "lineHeight": 35,
+                "fontColor": "#ffffff",
+                "textAlign": "center"
+              }
+            ],
             "postToURL": "https://vyvoj.prezza.cz/kafco-cajda/post.php"
           },
           {
@@ -196,6 +273,5 @@
 
         Konfigurator("https://vyvoj.prezza.cz/kafco-cajda/kava.php", $("#konfigurator"));
     </script>
-    <script src="../scripts/kafco-cajda-canvas.js"></script>
 </body>
 </html>

@@ -1,76 +1,83 @@
 /*Pomocné proměnné*/
-var finalProductURL = null;
+let finalProductURL = null;
 
-function generateImage(area, product, etiquette){
-    var background = new Image();
-    background.src = etiquette["image"];
-    var canvas = null;
+function wrapText(text, ctx, maxWidth){
+  let linesStatic = text.split("<br>");
+  let lines = [];
+  for(let j = 0; j < linesStatic.length; j++){
+    let words = linesStatic[j].split(" ");
+    let currentLine = words[0];
+
+    for (let i = 1; i < words.length; i++) {
+        let word = words[i];
+        let width = ctx.measureText(currentLine + " " + word).width;
+        if (width < maxWidth) {
+            currentLine += " " + word;
+        } else {
+            lines.push(currentLine);
+            currentLine = word;
+        }
+    }
+    lines.push(currentLine);
+  }
+  return lines;
+}
+
+function generateImage(area, product, etiquette, items){
+    let background = new Image();
+    background.src = etiquette["type"] === "staticImage" ? etiquette["image"] : product[etiquette["image"]];
+    let canvas = null;
 
     background.onload = function(){
       if(!$("#canvas").length) area.append("<canvas id=\"canvas\" width=\""+background.width+"\" height=\""+background.height+"\" style=\"display:none\"></canvas>")
       canvas = document.getElementById("canvas");
       const ctx = canvas.getContext("2d");
-
-      ctx.drawImage(background,0,0);   
+      ctx.drawImage(background,0,0);
       setTimeout(function(){
-        var text, cut, fontSizeText, regex;
+          for(i in items){
+            if(items[i].type === "text" || items[i].type === "data"){
+                let text = items[i].type === "text" ? $("#"+items[i].inputName).val() : product[items[i].columnName];
+                
+                ctx.textAlign = items[i].textAlign;
+                ctx.font = items[i].fontWeight + " " + items[i].fontSize+"px "+items[i].fontStyle;
+                ctx.fillStyle = items[i].fontColor;
 
-        text = $("#customText").val();
-        ctx.textAlign="center";
-        fontSizeText = etiquette["customTextSize"];
-        ctx.font = fontSizeText+'px Briko Rough';
-        ctx.fillStyle = "#ffffff";
-        cut = Math.round(text.length/(ctx.measureText(text).width/canvas.width))-2;
-        regex = new RegExp(".{"+cut+"}", "g");
-        text = text.replace(regex, "$&" + "<br>");
-        text = text.split("<br>");
-        for(let i = 0; i < text.length; i++) ctx.fillText(text[i].toUpperCase(), 400, (515-(fontSizeText*(text.length)/(400/fontSizeText)))+(i*fontSizeText));
-        
-        
-        if(product["resultTitle"] !== undefined){
-          text = product["resultTitle"];
-          fontSizeText = 35;
-          ctx.font = "bold "+fontSizeText+'px Arial';
-          text = text.split("<br>");
-          for(let i = 0; i < text.length; i++) ctx.fillText(text[i], 600, 810+(i*(fontSizeText+15)));
-        }
-        
-        if(product["resultDesc"] !== undefined){
-          text = product["resultDesc"];
-          fontSizeText = 25;
-          ctx.font = fontSizeText+'px Arial';
-          text = text.split("<br>");
-          for(let i = 0; i < text.length; i++) ctx.fillText(text[i], 600, 910+(i*(fontSizeText+15)));
-        }
+                text = wrapText(text, ctx, items[i].width);
+                let offset = items[i].adjustPositionLine ? items[i].lineHeight + (text.length * items[i].lineHeight) / 2 : 0;
+                for(let j = 0; j < text.length; j++){
+                  if(items[i].fontConvert === "uppercase") text[j] = text[j].toUpperCase();
+                  else if(items[i].fontConvert === "lowercase") text[j] = text[j].toLowerCase();
 
-        if(product["velikost"] !== undefined){
-          text = product["velikost"];
-          fontSizeText = 35;
-          ctx.font = "bold "+fontSizeText+'px Arial';
-          text = text.split("<br>");
-          for(let i = 0; i < text.length; i++) ctx.fillText(text[i], 600, 1150+(i*(fontSizeText+15)));
-        }
+                  ctx.fillText(text[j], items[i].left, items[i].top-offset+(j*items[i].lineHeight));
+                }
+          }
+          else if(items[i].type === "image"){
+            let item = items[i];
+            let customPhoto = new Image();
+            customPhoto.src = $("#"+items[i].inputName).val();
 
-        var customPhoto = new Image();
-        customPhoto.src = $("#productImage").val();
+            customPhoto.onload = function(){
+              let cropTo = 1;
+              if(customPhoto.height - item.height > customPhoto.width - item.width) cropTo = item.height/customPhoto.height;
+              else cropTo = item.width/customPhoto.width;
 
-        customPhoto.onload = function(){
-          var cropTo = 1;
-          if(customPhoto.height - 440 > customPhoto.width - 400) cropTo = 440/customPhoto.height;
-          else cropTo = 400/customPhoto.width;
-          ctx.drawImage(customPhoto, 0+((400-customPhoto.width*cropTo)/2), 777+((400-customPhoto.height*cropTo)/2), customPhoto.width*cropTo, customPhoto.height*cropTo);
-        };
+              let areaSize = 0;
+              if(item.adjustCropTo === "height") areaSize = item.height;
+              else areaSize = item.width;
+              ctx.beginPath();
+              ctx.drawImage(customPhoto, item.left+((areaSize-customPhoto.width*cropTo)/2), item.top+((areaSize-customPhoto.height*cropTo)/2), customPhoto.width*cropTo, customPhoto.height*cropTo);
+            };
+          }
+        }}, 50);
 
         setTimeout(function(){
           if(finalProductURL !== null) URL.revokeObjectURL(finalProductURL);
           canvas.toBlob((blob) => {
             finalProductURL = URL.createObjectURL(blob);
-            $(".product__etiketa").attr({"src": finalProductURL, width: "266px"});
+            $(".product__etiketa").attr({"src": finalProductURL, width: etiquette.finalRenderWidth+"px"});
             $("#finalProduct").val(canvas.toDataURL("image/png"));
           });
+          ctx.reset();
         }, 100);
-
-
-      }, 50);
     }
-  }
+}
