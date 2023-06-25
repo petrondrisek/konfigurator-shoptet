@@ -9,6 +9,7 @@ let resultsUnit = "";
 let showEmptyResults = true;
 let resultsTitle = "";
 let resultsArea = "";
+let resultsTooltip = "";
 
 /*Pomocné funkce*/
 function startsWithInArray(array, find) {
@@ -49,6 +50,9 @@ function baseSetting(area, settings){
 //Z JSONu vytvoří konfigurátor
 function konfiguratorCreate(area, dataValues, theme){
     for(let i in theme){
+        if(theme[i].type === "options"){
+            baseSetting(area, theme[i].settings);
+        }
         if(theme[i].type === "rangeHorizontal"){
           rangeFrom(area, dataValues, theme[i].inputName, theme[i].title, theme[i].description, theme[i].className, theme[i].colors, theme[i].tooltip);
         }
@@ -59,17 +63,17 @@ function konfiguratorCreate(area, dataValues, theme){
           selectFromMultiple(area, dataValues, theme[i].inputNames, theme[i].title, theme[i].inputTitles, theme[i].className, theme[i].inputClassNames, theme[i].optionImages, theme[i].inputOptionAliases, theme[i].optionRepeat, theme[i].tooltip);
         }
         else if(theme[i].type === "text"){
-          textInput(area, theme[i].inputName, theme[i].title, theme[i].className, theme[i].defaultText);
+          textInput(area, theme[i].inputName, theme[i].title, theme[i].className, theme[i].defaultText, theme[i].placeholder, theme[i].tooltip);
         }
         else if(theme[i].type === "image"){
-          fullImageArea(area, theme[i].inputName, theme[i].title, theme[i].className, theme[i].stackDefaultImages, theme[i].tooltip);
+          fullImageArea(area, theme[i].inputName, theme[i].title, theme[i].className, theme[i].stackDefaultImages, theme[i].tooltip, theme[i].cropRatio);
         }
         else if(theme[i].type === "finalProduct"){
           selectedProduct = dataValues[0];
-          finalProductGenerate(area, theme[i].id, theme[i].backgroundImage, theme[i].etiquette);
+          finalProductGenerate(area, theme[i].id, theme[i].backgroundImage, theme[i].etiquette, theme[i].postToURL);
         }
         else if(theme[i].type === "amount"){
-            amountInput(area, theme[i].title, theme[i].className);
+            amountInput(area, theme[i].title, theme[i].className, theme[i].tooltip);
         }
         else if(theme[i].type === "results"){
             resultsColumns = theme[i].columns;
@@ -78,119 +82,104 @@ function konfiguratorCreate(area, dataValues, theme){
             showEmptyResults = theme[i].showEmptyResults;
             resultsTitle = theme[i].title;
             resultsArea = theme[i].id;
+            resultsTooltip = theme[i].tooltip;
             area.append("<div id=\""+resultsArea+"\"></div>");
             showResults($("#"+resultsArea), resultsTitle, dataValues[0], false, 0, showEmptyResults);
         }
       }
+
+      area.html(area.html() + "<div class=\"konfiguratorChangeable konfiguratorPrice\"><h3>Cena za ks (s DPH): <span id=\"totalPrice\">"+dataValues[0]["cena"] * ($("#amount").length ? $("#amount").val() : 1)+"</span> Kč</h3></div>");
 }
 //Nejzákladnější funkce volaná ze stránky
-function Konfigurator(csvFileURL, area){
-    let request = new XMLHttpRequest();
-    request.open('GET', csvFileURL, true);
-    request.send(null);
-    request.onreadystatechange = function () {
-        if (request.readyState === 4 && request.status === 200) {
-            let type = request.getResponseHeader('Content-Type');
-            if (type.indexOf("text") !== 1) {
-                //Načtení dat z CSV
-                let data = String(request.responseText).split(/\r?\n/);
-                //letiable `dataValues`, který nese array všech hodnot
-                let dataValues = [];
-                let head  = data[0].split(";");
-                for(let i = 1; i < data.length; i++){
-                    let values = data[i].split(";");
-                    dataValues[i-1] = [];
-                    for(let j = 0; j < values.length;j++){
-                        if(values[j].length) dataValues[i-1][head[j]] = values[j];
+function Konfigurator(URL, area){
+    $.getJSON(URL, function(dataValues){
+        /*
+            Vzhled našeho konfiguratoru - fce se nenachází zde
+        */
+        konfiguratorCreate(area, dataValues, createKonfigurator);
+
+        //Eventy
+        //Vyhledání nového produktu při zmeně jednoho z polí
+        $(window).ready(function(){
+            $(".konfiguratorData").each(function(){
+                $(this).unbind().on('change',function(){
+                    konfiguratorChange(dataValues);
+                });
+            });
+            //Tooltip
+            $(".tooltip-toggle").each(function(){
+                $(this).unbind().click(function(){
+                    $(this).parent().find('.tooltip-toggle-bar').show();
+                });
+            });
+            $(".tooltip-toggle-bar .close").each(function(){
+                $(this).unbind().click(function(){
+                    $(this).parent().parent().hide();
+                });
+            });
+            //Konfigurator final product view
+            $(".konfigurator__product--open").each(function(){
+                $(this).unbind().click(function(){
+                    $(this).parent().find('.konfigurator__product').toggleClass("show");
+                });
+            });
+            $(".konfigurator__product--close").each(function(){
+                $(this).unbind().click(function(){
+                    $(this).parent().toggleClass("show");
+                });
+            });
+            //Multiple select open
+            $("[data-selector]").each(function(){
+                $(this).unbind().click(function(){
+                    openMultipleSelectStack(this, $(this).attr("data-selector"));
+                });
+            });
+            $(".removeOption").each(function(){
+                $(this).unbind().click(function(){
+                    changeValue(this);
+                    $('.selectedItem[data-change="'+$(this).attr("data-change")+'"]').removeClass('selectedItem');
+                });
+            });
+            //item select
+            $(".singleSelectItem, .multipleSelectFromStackItem, .imageStackItem").each(function(){
+                $(this).unbind().click(function(){
+                    changeValue(this);
+                });
+            });
+            //TextInput font size
+            $(".fontPlus").each(function(){
+                $(this).unbind().click(function(){
+                    addFontSize();
+                });
+            });
+            $(".fontMinus").each(function(){
+                $(this).unbind().click(function(){
+                    minusFontSize();
+                });
+            });
+            $("#amount").unbind().on("change, input", function(){
+                $(this).attr("value", $(this).val());
+            });
+            //Aktivování range sliderů
+            $(".slider").each(function(){
+                let values = $(this).attr("data-values");
+                $(this).slider({
+                    min: 0,
+                    max: 100,
+                    //value: (100/values)*Math.floor(values/2),
+                    orientation: "vertical",
+                    step: 100/(values !== undefined ? values-1 : 1),
+                    slide: function(event, ui){
+                        $(this).find(".ui-slider-handle").attr("data-height", Math.round(ui.value)+"%");
+                        $(this).parent().parent().find("#"+$(this).attr("data-column")).val(Math.round(ui.value*((values-1)/100)));
+                        let konfiguratorColors = $(this).parent().find("> .konfiguratorBackground").attr("data-background").split(";");
+                        $(this).parent().find("> .konfiguratorBackground").css({"height": ui.value+"%", "background": "#"+konfiguratorColors[Math.round(ui.value*((values-1)/100)) % konfiguratorColors.length]});
+                        $(this).parent().parent().find("> #"+$(this).attr("data-column")).trigger("change");
                     }
-                }
-
-                /*
-                    Vzhled našeho konfiguratoru - fce se nenachází zde
-                */
-                baseSetting(area, settings);
-                konfiguratorCreate(area, dataValues, createKonfigurator);
-
-                //Eventy
-                //Vyhledání nového produktu při zmeně jednoho z polí
-                $(window).ready(function(){
-                    $(".konfiguratorData").each(function(){
-                        $(this).unbind().on('change',function(){
-                            konfiguratorChange(dataValues);
-                        });
-                    });
-                    //Tooltip
-                    $(".tooltip-toggle").each(function(){
-                        $(this).unbind().click(function(){
-                            $(this).parent().find('.tooltip-toggle-bar').show();
-                        });
-                    });
-                    $(".tooltip-toggle-bar .close").each(function(){
-                        $(this).unbind().click(function(){
-                            $(this).parent().parent().hide();
-                        });
-                    });
-                    //Konfigurator final product view
-                    $(".konfigurator__product--open").each(function(){
-                        $(this).unbind().click(function(){
-                            $(this).parent().find('.konfigurator__product').toggleClass("show");
-                        });
-                    });
-                    $(".konfigurator__product--close").each(function(){
-                        $(this).unbind().click(function(){
-                            $(this).parent().toggleClass("show");
-                        });
-                    });
-                    //Multiple select open
-                    $("[data-selector]").each(function(){
-                        $(this).unbind().click(function(){
-                            openMultipleSelectStack(this, $(this).attr("data-selector"));
-                        });
-                    });
-                    $(".removeOption").each(function(){
-                        $(this).unbind().click(function(){
-                            changeValue(this);
-                            $('.selectedItem[data-change="'+$(this).attr("data-change")+'"]').removeClass('selectedItem');
-                        });
-                    });
-                    //item select
-                    $(".singleSelectItem, .multipleSelectFromStackItem, .imageStackItem").each(function(){
-                        $(this).unbind().click(function(){
-                            changeValue(this);
-                        });
-                    });
-                    //TextInput font size
-                    $(".fontPlus").each(function(){
-                        $(this).unbind().click(function(){
-                            addFontSize();
-                        });
-                    });
-                    $(".fontMinus").each(function(){
-                        $(this).unbind().click(function(){
-                            minusFontSize();
-                        });
-                    });
-                    //Aktivování range sliderů
-                    $(".slider").each(function(){
-                        let values = $(this).attr("data-values");
-                        $(this).slider({
-                            min: 0,
-                            max: 100,
-                            orientation: "vertical",
-                            step: 100/(values !== undefined ? values-1 : 1),
-                            slide: function(event, ui){
-                                $(this).find(".ui-slider-handle").attr("data-height", Math.round(ui.value)+"%");
-                                $(this).parent().parent().find("#"+$(this).attr("data-column")).val(Math.round(ui.value*((values-1)/100)));
-                                let konfiguratorColors = $(this).parent().find("> .konfiguratorBackground").attr("data-background").split(";");
-                                $(this).parent().find("> .konfiguratorBackground").css({"height": ui.value+"%", "background": "#"+konfiguratorColors[Math.round(ui.value*((values-1)/100)) % konfiguratorColors.length]});
-                                $(this).parent().parent().find("> #"+$(this).attr("data-column")).trigger("change");
-                            }
-                        });
-                    });
-                });   
-            }
-        }
-    };
+                });
+            });
+        });   
+    });
 }
 
 /*Change eventy*/
@@ -236,7 +225,7 @@ function changeValue(element){
     if($(element).parent().parent().parent().parent().find("[data-selector='"+$(element).attr("data-change")+"']").length){
         if($(element).attr("data-values") !== "undefined"){
             resultsTitles[startsWithInArray(resultsTitles, $("[data-selector='"+$(element).attr("data-change")+"'] .selectorName").text().split(": ")[0])] = $("[data-selector='"+$(element).attr("data-change")+"'] .selectorName").text().split(": ")[0] + ": " + $(element).text();
-            $(".konfiguratorProductResults__item__title:contains('"+($("[data-selector='"+$(element).attr("data-change")+"'] .selectorName").text().split(": ")[0])+"')").html("xx");
+            $(".konfiguratorProductResults__item__title:contains('"+($("[data-selector='"+$(element).attr("data-change")+"'] .selectorName").text().split(": ")[0])+"')").html("");
             $("[data-selector='"+$(element).attr("data-change")+"'] .selectorName").html($("[data-selector='"+$(element).attr("data-change")+"'] .selectorName").text().split(": ")[0] + ": " + $(element).text());
             $("[data-selector='"+$(element).attr("data-change")+"'] img").attr("src", $(element).find(".optionImage img").attr("src"));
         } else {
@@ -261,11 +250,12 @@ function showResults(area, title, product, update, defaultValue, showNull = true
     
         //Zobrazení výsledků na finální podobě produktu
         selectedProduct = product;
-        finalProductGenerate(area, null, null, createKonfigurator[Object.keys(createKonfigurator).find(key => createKonfigurator[key].type=== "finalProduct")].etiquette, true);
+        finalProductGenerate(area, null, null, createKonfigurator[Object.keys(createKonfigurator).find(key => createKonfigurator[key].type=== "finalProduct")].etiquette, createKonfigurator[Object.keys(createKonfigurator).find(key => createKonfigurator[key].type=== "finalProduct")].postToURL, true);
     }
     htmlInsert+="</div>";
+    htmlInsert+=tooltip(resultsTooltip);
 
-    
+    $("#totalPrice").html(product["cena"]);
 
     if(update === null || update === undefined || update === false) return area.html(area.html() + htmlInsert);
     else return area.html(htmlInsert);
@@ -274,20 +264,18 @@ function showResults(area, title, product, update, defaultValue, showNull = true
 
 /*Selectory*/
 //Amount
-function amountInput(area, title, className){
-    let htmlInsert = "<div class=\"konfiguratorAmount konfiguratorChangeable "+className+"\"><h2>"+title+"</h2><input type=\"number\" id=\"amount\" class=\"konfiguratorData\" value=\"1\"></div>";
-
+function amountInput(area, title, className, toolTip = ""){
+    let htmlInsert = "<div class=\"konfiguratorAmount konfiguratorChangeable "+className+"\"><h2>"+title+"</h2><input type=\"number\" id=\"amount\" class=\"konfiguratorData\" value=\"1\">"+tooltip(toolTip)+"</div>";
     area.html(area.html() + htmlInsert);
 }
 //Textový selektor
-function textInput(area, name, title, className, defaultValue = ""){
-    let htmlInsert = "<div class=\"konfiguratorText "+className+" konfiguratorChangeable\"><h2>"+title+"</h2><input type=\"text\" data-change=\""+name+"\" onkeydown=\"textInputKeyDown(event, this)\"><input type=\"hidden\" name=\""+name+"\" id=\""+name+"\" value=\""+defaultValue+"\" class=\"konfiguratorData\"><button class=\"fontPlus\" data-textInput=\""+name+"\">+</button><button class=\"fontMinus\" data-textInput=\""+name+"\">-</button></div>";
-
+function textInput(area, name, title, className, defaultValue = "", placeholder="", toolTip = ""){
+    let htmlInsert = "<div class=\"konfiguratorText "+className+" konfiguratorChangeable\"><h2>"+title+"</h2><div class=\"inputTextarea\"><input type=\"text\" placeholder=\""+placeholder+"\" data-change=\""+name+"\" onkeydown=\"textInputKeyDown(event, this)\"><input type=\"hidden\" name=\""+name+"\" id=\""+name+"\" value=\""+defaultValue+"\" class=\"konfiguratorData\"><button class=\"fontPlus\" data-textInput=\""+name+"\"><span class=\"small\">zvětšit</span> A<sup>+</sup></button><button class=\"fontMinus\" data-textInput=\""+name+"\"><span class=\"small\">zmenšit</span> A<sup>-</sup></button></div>"+tooltip(toolTip)+"</div>";
     return area.html(area.html() + htmlInsert);
 }
 function textInputKeyDown(event, element){
-    let blockedKeyCodes = [8, 9, 13, 16, 17, 18, 20, 27, 33, 34, 35, 36, 45, 46, 91, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 144, 229];
-    $(element).attr('data-values', (event.keyCode === 8 ? $(element).val().slice(0, $(element).val().length-1) : $(element).val())+(blockedKeyCodes.includes(event.keyCode) ? '' : event.key));
+    let blockedKeyCodes = [8, 9, 13, 16, 17, 18, 20, 27, 33, 34, 35, 36, 45, 46, 91, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 144];
+    $(element).attr('data-values', (event.which === 8 ? $(element).val().slice(0, $(element).val().length-1) : $(element).val())+(blockedKeyCodes.includes(event.which) ? '' : event.key));
     changeValue(element);
 }
 function addFontSize(){
@@ -323,7 +311,7 @@ function selectFromMultiple(area, data, columns, title, columnTitles, classNameA
         }
         values[i] = selectDistinct(values[i]);
 
-        htmlInsert+="<div data-column=\""+columns[i]+"\" data-repeat=\""+repeat+"\" class=\"konfigurator__multipleSelectFrom__stack multipleSelectFromStack\">";
+        htmlInsert+="<div data-column=\""+columns[i]+"\" data-repeat=\""+repeat+"\" class=\"konfigurator__multipleSelectFrom__stack multipleSelectFromStack "+(i === 0 ? "selectedStackItem" : "")+"\">";
         for(let j = 0; j < values[i].length; j++){
             htmlInsert+="<div class=\"multipleSelectFromStackItem"+(j === 0 ? " selectedItem" : "")+(values[i][j] === "undefined" ? " undefinedItem" : "")+"\" data-values=\""+values[i][j]+"\" data-change=\""+columns[i]+"\">"+(images === true ? "<div class=\"optionImage\"><img src=\"./"+values[i][j]+".png\" alt=\"Obrazek\"></div>": "")+"<p class=\"optionText\">"+(itemTitles === undefined || itemTitles[i] === undefined || itemTitles[i][j] === undefined ? values[i][j] : itemTitles[i][j])+"</p></div>";
         }
@@ -378,7 +366,7 @@ function rangeFrom(area, data, column, title, desc, className, colors = ["00f"],
     return true;
 }
 //Images
-function fullImageArea(area, columnName, title, className, defaultImages = [], toolTip = ""){
+function fullImageArea(area, columnName, title, className, defaultImages = [], toolTip = "", cropRatio = 8/9){
     let upload = uploadImage(className, columnName);
     let stack = selectImage(className, columnName, defaultImages);
     let htmlInsert = "<div class=\"konfiguratorChangeable "+className+"\"><h2>"+title+"</h2>";
@@ -387,6 +375,7 @@ function fullImageArea(area, columnName, title, className, defaultImages = [], t
     htmlInsert+="<i>nebo si vyberte z předem nahraných...</i>";
     htmlInsert+=stack;
     htmlInsert+="</div>";
+    htmlInsert+="<button class=\"btn btn-primary\" onclick='editImage("+cropRatio+", \""+columnName+"\", \""+className+"\")'>Upravit obrázek</button>"
 
     return area.html(area.html() + htmlInsert);
 }
@@ -461,13 +450,19 @@ function editImage(aspectRatio, columnName, fileStack){
     $("#konfiguratorModal").modal("show");
 }
 
+function showPrice(price){
+    return $("#totalPrice").html(price);
+}
+
 //Tooltip
 function tooltip(text){
     return text.length ? "<div class=\"tooltip-toggle\">?</div><div class=\"tooltip-toggle-bar\"><div class=\"tooltip-toggle-bar__content\"><span class=\"close\">&times;</span><p class=\"tooltip-toggle-bar__content__text\">"+text+"<p></div></div>" : "";
 }
 
 /*Závěr*/
-function finalProductGenerate(area, id, backgroundImage, etiquette, update = false){
+function finalProductGenerate(area, id, backgroundImage, etiquette, urlPost, update = false){
+    if(id !== null && $("[data-finalProduct=\""+id+"\"]").length === 0) $(area).html($(area).html() + "<button data-finalProduct=\""+id+"\" class=\"orderSubmit btn btn-success\">Vložit do košíku</button>");
+    submitOrderEvent(urlPost);
     let htmlInsert = "";
     
     if(update === false){
@@ -513,4 +508,49 @@ function finalProductGenerate(area, id, backgroundImage, etiquette, update = fal
             $("#finalProduct").html(htmlInsert);
         }
     }
+}
+
+function submitOrderEvent(urlPost){
+    $(".orderSubmit").unbind().click(function(){
+        let formData = new FormData();
+        $(".konfiguratorData").each(function(){
+          formData.append($(this).attr("id"), $(this).val());
+        });
+
+        formData.append("productCode", selectedProduct["produkt"]);
+        formData.append("productPrice", selectedProduct["cena"]);
+        
+        //Vyřešení obrázku
+        if($("#"+$(this).attr("data-finalproduct")).length){
+          let blob = dataURLtoBlob($("#"+$(this).attr("data-finalproduct")).val());
+          formData.append("file", blob, "image.png");
+          formData.append("upload_file", true);
+        }
+
+        $.ajax({
+          type: "POST",
+          data: formData,
+          contentType: false,
+          processData: false,
+          url: urlPost,
+          success: function(data){
+            console.log(data);
+          },
+          error: function(req, error){
+            console.error(error);
+          }
+        });
+      });
+}
+
+
+/* Odeslání objednávky do košíku */
+//Vytvoři z BLOB obrázku File
+function dataURLtoBlob(dataurl) {
+    var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+    while(n--){
+        u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new Blob([u8arr], {type:mime});
 }

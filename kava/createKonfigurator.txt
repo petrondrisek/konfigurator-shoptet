@@ -1,0 +1,218 @@
+        [
+            {
+                "type": "options",
+                "settings": {
+                    "SelectedOptionRelationHideOption": {
+                        "cerny":[
+                            "bezovy_kvet",
+                            "dobromysl",
+                            "hermanek",
+                            "kopriva",
+                            "lipovy_kvet",
+                            "materidouska",
+                            "mata",
+                            "medunka",
+                            "sipek",
+                            "rebricek",
+                            "trezalka",
+                            "zazvor"
+                        ],
+                        "oolong":[
+                            "bezovy_kvet",
+                            "dobromysl",
+                            "hermanek",
+                            "kopriva",
+                            "lipovy_kvet",
+                            "materidouska",
+                            "mata",
+                            "medunka",
+                            "sipek",
+                            "rebricek",
+                            "trezalka",
+                            "zazvor"
+                        ],
+                        "zeleny":[
+                            "bezovy_kvet",
+                            "dobromysl",
+                            "hermanek",
+                            "kopriva",
+                            "lipovy_kvet",
+                            "materidouska",
+                            "mata",
+                            "medunka",
+                            "sipek",
+                            "rebricek",
+                            "trezalka",
+                            "zazvor"
+                        ],
+                        "bylinny":[
+                            "ananas",
+                            "banan",
+                            "boruvka",
+                            "brusinka",
+                            "cerny_rybiz",
+                            "hruska",
+                            "jablko",
+                            "jahoda",
+                            "kustovnice",
+                            "malina",
+                            "mango",
+                            "ostruzina",
+                            "rakytnik",
+                            "visen"
+                        ]
+                    }
+                }
+            },
+            {
+                "type": "select",
+                "inputName": "zaklad",
+                "title": "Základ čaje",
+                "className": "konfigurator__zaklad",
+                "optionImages": true,
+                "optionAliases": [
+                    "Černý čaj",
+                    "OOlong",
+                    "Zelený čaj",
+                    "Bylinný čaj"
+                ],
+                "tooltip": ""
+            },
+            {
+            "type": "multipleSelect",
+            "inputNames": [
+                "prisada_1",
+                "prisada_2",
+            ],
+            "title": "Přísady čaje",
+            "inputTitles": [
+                "Přísada 1",
+                "Přísada 2"
+            ],
+            "className": "konfigurator__prisady",
+            "inputClassNames": [
+                "konfigurator__prisada1",
+                "konfigurator__prisada2"
+            ],
+            "optionImages": true,
+            "inputOptionAliases": [ //pro každý input zvlášť
+                [
+                    "", //Není nic zvoleno, undefined
+                    "Ananas", 
+                    "Banán",
+                    "Borůvka", 
+                    "Brusinka", 
+                    "Černý rybíz", 
+                    "Hruška", 
+                    "Jablko", 
+                    "Jahoda", 
+                    "Kustovnice", 
+                    "Malina", 
+                    "Mango", 
+                    "Ostružina", 
+                    "Rakytník", 
+                    "Višeň", 
+                    "Bezový květ", 
+                    "Dobromysl (oregáno)", 
+                    "Heřmánek", 
+                    "Kopřiva", 
+                    "Lipový květ", 
+                    "Mateřídouška", 
+                    "Máta", 
+                    "Meduňka", 
+                    "Řebříček", 
+                    "Šípek", 
+                    "Třezalka", 
+                    "Zázvor"
+                ],
+                [
+                    "", //Není nic zvoleno, undefined
+                    "Ananas", 
+                    "Banán",
+                    "Borůvka", 
+                    "Brusinka", 
+                    "Černý rybíz", 
+                    "Hruška", 
+                    "Jablko", 
+                    "Jahoda", 
+                    "Kustovnice", 
+                    "Malina", 
+                    "Mango", 
+                    "Ostružina", 
+                    "Rakytník", 
+                    "Višeň", 
+                    "Bezový květ", 
+                    "Dobromysl (oregáno)", 
+                    "Heřmánek", 
+                    "Kopřiva", 
+                    "Lipový květ", 
+                    "Mateřídouška", 
+                    "Máta", 
+                    "Meduňka", 
+                    "Řebříček", 
+                    "Šípek", 
+                    "Třezalka", 
+                    "Zázvor"
+                ],
+            ],
+            "optionRepeat": false, //může se input1 a input2 vyskytnout stejný? vyhodí hlášku
+            "tooltip": ""
+          },
+          {
+            "type": "text",
+            "inputName": "customText",
+            "title": "Vlastní text",
+            "className": "konfigurator__customText",
+            "defaultText": "Vlastní čaj",
+            "tooltip": ""
+          },
+          {
+            "type": "image",
+            "inputName": "productImage",
+            "title": "Vlastní obrázek",
+            "className": "konfigurator__image",
+            "stackDefaultImages": [
+              "../defaultImages/864e722ffec887cf10087c038468b76a.jpg",
+              "../defaultImages/48e4b5c124c69244902ddbcaf3a25fc7.png", 
+              "../defaultImages/864e722ffec887cf10087c038468b76a.jpg",
+              "../defaultImages/48e4b5c124c69244902ddbcaf3a25fc7.png", 
+              "../defaultImages/864e722ffec887cf10087c038468b76a.jpg",
+              "../defaultImages/48e4b5c124c69244902ddbcaf3a25fc7.png", 
+              "../defaultImages/864e722ffec887cf10087c038468b76a.jpg",
+            ],
+            "tooltip": ""
+          },
+          {
+                "type": "select",
+                "inputName": "velikost",
+                "title": "Velikost balení",
+                "className": "konfigurator__velikost",
+                "optionImages": false,
+                "optionAliases": [
+                    "50 G",
+                    "100 G",
+                    "200 G"
+                ],
+                "tooltip": ""
+            },
+            {
+            "type": "finalProduct",
+            "id": "finalProduct",
+            "backgroundImage": "../defaultImages/bag.jpg",
+            "etiquette": {
+              "image":"../defaultImages/tea_etiquette_800x1992.png",
+              "className": "product__etiketa",
+              "customTextSize": 90
+            }
+          },
+          {
+            "type": "results",
+            "title": "Poměr chuti",
+            "id": "konfiguratorResults",
+            "columns": ["zaklad_g", "prisada_1g", "prisada_2g"],
+            "unit": "g",
+            "columnAliases": ["Základ", "Přísada 1", "Přísada 2"],
+            "showEmptyResults": false,
+            "tooltip": ""
+          }
+        ];

@@ -29,6 +29,12 @@ body{
 
 .konfiguratorRange{
     float: left;
+    width: 173px;
+    height: 144px;
+}
+
+.ui-slider-vertical .ui-slider-handle, .ui-slider-vertical .ui-slider-handle.ui-state-hover{
+    transform: translateX(-85%);
 }
 
 .konfiguratorDescription img{
@@ -55,6 +61,7 @@ body{
 #konfiguratorResults{
     background: #eeeeee;
     padding: 1.5rem 0 .5rem;
+    position: relative;
 }
 .konfiguratorProductResults{
     justify-content: center;
@@ -190,6 +197,61 @@ body{
     display:flex;
     align-items:center;
     gap: 1rem;
+}
+
+/*Slider šipka*/
+.ui-slider-handle:after{
+    display: block;
+    width: 100%;
+    height: 100%;
+    /*content: "" !important;*/
+    /*background: url("../defaultImages/sprite.svg#arrow-up-down") black !important;*/
+}
+
+/*Nadpisy h2*/
+.konfiguratorChangeable h2{
+    font-size: 2.2rem;
+    margin-bottom: 1rem;
+}
+
+/*Nadpisy čísla*/
+.konfigurator__chut h2:before,
+.konfigurator__aroma h2:before,
+.konfigurator__mleti h2:before,
+.konfigurator__image h2:before,
+.konfigurator__customText h2:before,
+.konfigurator__velikost h2:before,
+.konfiguratorAmount h2:before
+{
+    content: "1";
+    display: inline-block;
+    margin-right: 1.7rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    line-height: 40px;
+    border-radius: 50%;
+    background-color: #6babab;
+    color: #fff;
+    vertical-align: top;
+    text-align: center;
+}
+.konfigurator__aroma h2:before{
+    content: "2";
+}
+.konfigurator__mleti h2:before{
+    content: "3";
+}
+.konfigurator__image h2:before{
+    content: "4";
+}
+.konfigurator__customText h2:before{
+    content: "5";
+}
+.konfigurator__velikost h2:before{
+    content: "6";
+}
+.konfiguratorAmount h2:before{
+    content: "7";
 }
 
 @media only screen and (max-width:1200px){

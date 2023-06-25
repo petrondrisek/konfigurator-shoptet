@@ -38,7 +38,6 @@
           </div>
         </div>
     </div>
-    <button class="btn btn-primary" onclick='editImage("productImage", "konfigurator__image")'>Upravit obrázek</button>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.7.0.min.js" integrity="sha256-2Pmvv0kuTBOenSvLm6bvfBSSHrUJ+3A7x6P5Ebd07/g=" crossorigin="anonymous"></script>
@@ -46,73 +45,72 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js" integrity="sha512-6lplKUSl86rUVprDIjiW8DuOniNX8UDoRATqZSds/7t6zCQZfaCe3e5zcGaQwxa8Kpn5RTM9Fvl3X2lLV4grPQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="../scripts/konfigurator.js"></script>
     <script>
-        function konfiguratorTheme(area, dataValues){
-            baseSetting(area, settings);
-            konfiguratorCreate(area, dataValues, createKonfigurator);
-        }
-        var settings = {
-          "SelectedOptionRelationHideOption": {
-            "cerny":[
-                "bezovy_kvet",
-                "dobromysl",
-                "hermanek",
-                "kopriva",
-                "lipovy_kvet",
-                "materidouska",
-                "mata",
-                "medunka",
-                "sipek",
-                "rebricek",
-                "trezalka",
-                "zazvor"
-            ],
-            "oolong":[
-                "bezovy_kvet",
-                "dobromysl",
-                "hermanek",
-                "kopriva",
-                "lipovy_kvet",
-                "materidouska",
-                "mata",
-                "medunka",
-                "sipek",
-                "rebricek",
-                "trezalka",
-                "zazvor"
-            ],
-            "zeleny":[
-                "bezovy_kvet",
-                "dobromysl",
-                "hermanek",
-                "kopriva",
-                "lipovy_kvet",
-                "materidouska",
-                "mata",
-                "medunka",
-                "sipek",
-                "rebricek",
-                "trezalka",
-                "zazvor"
-            ],
-            "bylinny":[
-              "ananas",
-              "banan",
-              "boruvka",
-              "brusinka",
-              "cerny_rybiz",
-              "hruska",
-              "jablko",
-              "jahoda",
-              "kustovnice",
-              "malina",
-              "mango",
-              "ostruzina",
-              "rakytnik",
-              "visen"
-            ]
-          }
-        };
         var createKonfigurator = [
+          {
+            "type": "options",
+            "settings": {
+              "SelectedOptionRelationHideOption": {
+              "cerny":[
+                  "bezovy_kvet",
+                  "dobromysl",
+                  "hermanek",
+                  "kopriva",
+                  "lipovy_kvet",
+                  "materidouska",
+                  "mata",
+                  "medunka",
+                  "sipek",
+                  "rebricek",
+                  "trezalka",
+                  "zazvor"
+              ],
+              "oolong":[
+                  "bezovy_kvet",
+                  "dobromysl",
+                  "hermanek",
+                  "kopriva",
+                  "lipovy_kvet",
+                  "materidouska",
+                  "mata",
+                  "medunka",
+                  "sipek",
+                  "rebricek",
+                  "trezalka",
+                  "zazvor"
+              ],
+              "zeleny":[
+                  "bezovy_kvet",
+                  "dobromysl",
+                  "hermanek",
+                  "kopriva",
+                  "lipovy_kvet",
+                  "materidouska",
+                  "mata",
+                  "medunka",
+                  "sipek",
+                  "rebricek",
+                  "trezalka",
+                  "zazvor"
+              ],
+              "bylinny":[
+                "ananas",
+                "banan",
+                "boruvka",
+                "brusinka",
+                "cerny_rybiz",
+                "hruska",
+                "jablko",
+                "jahoda",
+                "kustovnice",
+                "malina",
+                "mango",
+                "ostruzina",
+                "rakytnik",
+                "visen"
+              ]
+            }
+            }
+          },
             {
                 "type": "select",
                 "inputName": "zaklad",
@@ -125,7 +123,7 @@
                     "Zelený čaj",
                     "Bylinný čaj"
                 ],
-                "tooltip": ""
+                "tooltip": "V prvním kroku zvolte základ Vašeho čaj - černý, zelený, bílý nebo čistě bylinkový."
             },
             {
             "type": "multipleSelect",
@@ -205,7 +203,7 @@
                 ],
             ],
             "optionRepeat": false, //může se input1 a input2 vyskytnout stejný? vyhodí hlášku
-            "tooltip": ""
+            "tooltip": "<h3>Popis přísad do čaje</h3><p>Do základu čaje můžete přidat až 2 přísady - příchuti či bylinky. Níže můžete vidět seznam jednotlivých přísad.</p><div class=\"col w50\"><h4>SUŠENÉ OVOCE:</h4><p>Ovoce sušené mrazem, takzvanou lyofilizací je sušeno hlubokým mrazem a za velmi nízkého tlaku. Díky tomuto je zachována jak původní struktura, tak i chuť, všechny minerály a vitamíny! Takto vysušené potraviny, jsou oproti běžnému sušení 100% přírodní a bez přidaného cukru. Lyofilizace eliminuje většinu mikrobiálních nečistot a zajišťuje dlouhou trvanlivost produktu (2 roky).</p><p>Výhody mrazem sušeného (lyofilizovaného) ovoce: <br>- chuť a vůně je mnohem lepší než u ovoce sušeného teplem<br>- jsou zachovány vitamíny a minerály <br>- přírodní produkt bez přidání chemikálií a cukru<br>- barva a podoba je téměř stejná jako u čerstvého ovoce<br>- využití je stejné jako u čestvého ovoce</p><p>JABLKO - BANÁN – ČERNÝ RYBÍZ – BRUSINKA – BROSKEV – HRUŠKA - ANANAS - MALINA - JAHODA - VIŠEŇ - OSTRUŽINA - BORŮVKA – KUSTOVNICE – MANGO - RAKYTNÍK</p></div><div class=\"col w50\"><h4>BYLINKY:</h4><p>BEZOVÝ KVĚT – kašel a průdušky <br>MEDUŇKA - nespavost <br>TŘEZALKA – nervozita, stres únava <br>ŘEBŘÍČEK – trávení, žaludeční potíže <br>HEŘMÁNEK – nachlazení, horečky <br>DOBROMYSL – problémy dýchacího ústrojí, plicní onemocnění, nadýmání <br>LIPOVÝ KVĚT – bolest v krku <br>ŠÍPEK – bolesti hlavy <br>KOPŘIVA – akné, pálení žáhy <br>MATEŘÍDOUŠKA – menstruační bolesti, zápach z úst <br>MÁTA – oslabená imunita, nevolnost škytání <br>BÍLÝ ČAJ – prevence pro kardiovaskulárním chorobám a rakovině<br></p></div>"
           },
           {
             "type": "text",
@@ -213,7 +211,8 @@
             "title": "Vlastní text",
             "className": "konfigurator__customText",
             "defaultText": "Vlastní čaj",
-            "tooltip": ""
+            "tooltip": "Napište věnování nebo si vlastní směs pojmenujte.",
+            "placeholder": "Napište vzkaz na balení Vašeho čaje ..."
           },
           {
             "type": "image",
@@ -222,27 +221,23 @@
             "className": "konfigurator__image",
             "stackDefaultImages": [
               "../defaultImages/864e722ffec887cf10087c038468b76a.jpg",
-              "../defaultImages/48e4b5c124c69244902ddbcaf3a25fc7.png", 
-              "../defaultImages/864e722ffec887cf10087c038468b76a.jpg",
-              "../defaultImages/48e4b5c124c69244902ddbcaf3a25fc7.png", 
-              "../defaultImages/864e722ffec887cf10087c038468b76a.jpg",
-              "../defaultImages/48e4b5c124c69244902ddbcaf3a25fc7.png", 
-              "../defaultImages/864e722ffec887cf10087c038468b76a.jpg",
+              "../defaultImages/48e4b5c124c69244902ddbcaf3a25fc7.png"
             ],
-            "tooltip": ""
+            "tooltip": "Na váš sáček si můžete umístit vlastní fotografii nebo si vybrat některý z našich obrázků a udělat si tak vlastní směs ještě originálnější. Pokud se vám nedaří zvolená fotografie nahrát, pošlete nám jí emailem v odpovědi na potvrzení objednávky a upozorněte nás na to v poznámce v košíku v dalším kroku.",
+            "cropRatio": 8/9
           },
           {
                 "type": "select",
                 "inputName": "velikost",
                 "title": "Velikost balení",
                 "className": "konfigurator__velikost",
-                "optionImages": false,
+                "optionImages": true,
                 "optionAliases": [
                     "50 G",
                     "100 G",
                     "200 G"
                 ],
-                "tooltip": ""
+                "tooltip": "Zde si můžete vybrat velikost balení - 50g, 100g nebo 200g."
             },
             {
             "type": "finalProduct",
@@ -252,7 +247,8 @@
               "image":"../defaultImages/tea_etiquette_800x1992.png",
               "className": "product__etiketa",
               "customTextSize": 90
-            }
+            },
+            "postToURL": "https://vyvoj.prezza.cz/kafco-cajda/post.php"
           },
           {
             "type": "results",
@@ -261,11 +257,18 @@
             "columns": ["zaklad_g", "prisada_1g", "prisada_2g"],
             "unit": "g",
             "columnAliases": ["Základ", "Přísada 1", "Přísada 2"],
-            "showEmptyResults": false
-          }
+            "showEmptyResults": false,
+            "tooltip": "Níže můžete vidět poměr jednotlivých přísad.",
+          },
+          {
+            "type": "amount",
+            "title": "Počet kusů",
+            "className": "",
+            "tooltip": "Stačí už jen zvolit počet kusů a vaše vlastní čajová směs je hotová."
+          },
         ];
 
-        Konfigurator("./caj.csv", $("#konfigurator"));
+        Konfigurator("https://vyvoj.prezza.cz/kafco-cajda/caj.php", $("#konfigurator"));
     </script>
     <script src="../scripts/kafco-cajda-canvas.js"></script>
 </body>
