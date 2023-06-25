@@ -270,16 +270,17 @@ function amountInput(area, title, className, toolTip = ""){
 }
 //Textový selektor
 function textInput(area, name, title, className, defaultValue = "", placeholder="", toolTip = ""){
-    let htmlInsert = "<div class=\"konfiguratorText "+className+" konfiguratorChangeable\"><h2>"+title+"</h2><div class=\"inputTextarea\"><input type=\"text\" placeholder=\""+placeholder+"\" data-change=\""+name+"\" onkeydown=\"textInputKeyDown(event, this)\"><input type=\"hidden\" name=\""+name+"\" id=\""+name+"\" value=\""+defaultValue+"\" class=\"konfiguratorData\"><button class=\"fontPlus\" data-textInput=\""+name+"\"><span class=\"small\">zvětšit</span> A<sup>+</sup></button><button class=\"fontMinus\" data-textInput=\""+name+"\"><span class=\"small\">zmenšit</span> A<sup>-</sup></button></div>"+tooltip(toolTip)+"</div>";
+    let htmlInsert = "<div class=\"konfiguratorText "+className+" konfiguratorChangeable\"><h2>"+title+"</h2><div class=\"inputTextarea\"><input type=\"text\" placeholder=\""+placeholder+"\" data-change=\""+name+"\" oninput=\"textInputKeyDown(event, this)\"><input type=\"hidden\" name=\""+name+"\" id=\""+name+"\" value=\""+defaultValue+"\" class=\"konfiguratorData\"><button class=\"fontPlus\" data-textInput=\""+name+"\"><span class=\"small\">zvětšit</span> A<sup>+</sup></button><button class=\"fontMinus\" data-textInput=\""+name+"\"><span class=\"small\">zmenšit</span> A<sup>-</sup></button></div>"+tooltip(toolTip)+"</div>";
     return area.html(area.html() + htmlInsert);
 }
 function textInputKeyDown(event, element){
     //poslední zaznamenané tlačítko - bug android chromu
-    let inputValue = event.target.value;
+    /*let inputValue = event.target.value;
     let key = inputValue.charAt(inputValue.length - 1);
-
+*/
     let blockedKeyCodes = [8, 9, 13, 16, 17, 18, 20, 27, 33, 34, 35, 36, 45, 46, 91, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 144];
-    $(element).attr('data-values', (event.which === 8 ? $(element).val().slice(0, $(element).val().length-1) : $(element).val())+(blockedKeyCodes.includes(event.which) ? '' : key));
+    $(element).attr("data-values", $(element).val());
+    //$(element).attr('data-values', (event.which === 8 ? $(element).val().slice(0, $(element).val().length-1) : $(element).val())+(blockedKeyCodes.includes(event.which) ? '' : key));
     changeValue(element);
 }
 function addFontSize(){
