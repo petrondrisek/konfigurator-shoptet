@@ -1,3 +1,12 @@
+@keyframes fadeIn{
+    0%{
+        opacity: 0;
+    }
+    100%{
+        opacity: 1;
+    }
+}
+
 body{
     background: #f4f4f4;
 }
@@ -44,16 +53,14 @@ body{
     right: .6rem;
     background: white;
     padding: .5rem;
-    max-width: 80%;
-    min-width: 4rem;
-    min-height: auto;
-    height: auto;
-    max-height: 50rem;
+    max-width: 60%;
+    max-height: 20rem;
     overflow: auto;
 }
 .tooltip-toggle-bar__content{
     position: relative;
     width: 100%;
+    height: auto !important;
     display: flex;
     align-items: center;
     padding-right: 1.5rem;
@@ -79,36 +86,43 @@ body{
     margin-left: 1rem;
     font-size: 70%;
 }
-.multipleSelectFrom__selectors{
+.konfiguratorMultiple__selectors{
     position: relative;
 }
-.multipleSelectFrom__selectors div{
+.konfiguratorMultiple__selectors div{
     height: 5rem;
     cursor: pointer;
 }
-.multipleSelectFrom__selectors img{
+.konfiguratorMultiple__selectors img{
     height: 100%;
     border-radius: 100%;
     margin-right: 1rem;
 }
-.multipleSelectFrom__area{
+.konfiguratorMultiple__area{
     width: 100%;
     display:block;
 }
-.multipleSelectFromStack{
+.konfiguratorMultipleStack{
     display: none;
 }
-.multipleSelectFromStack.selectedStackItem{
-    display: flex !important;
+.konfiguratorMultipleStack.selectedStackItem, .konfiguratorSingle__area{
+    display: grid;
+    grid-auto-columns: 5rem;
+    word-break: break-word;
+    grid-auto-flow: column;
     gap: 1rem;
     overflow-x: auto;
     overflow-y: hidden;
     width: 100%;
+    animation: fadeIn .5s forwards;
 }
-.multipleSelectFromStackItem{
+.konfiguratorSingle__area{
+    flex-wrap: wrap;
+}
+.konfiguratorMultipleStackItem, .konfiguratorSingle__area > div{
     text-align: center;
 }
-.multipleSelectFromStackItem .optionImage{
+.konfiguratorMultipleStackItem .optionImage, .konfiguratorSingle__area .optionImage{
     border-radius: 100%;
     display: block;
     margin-bottom: .2rem;
@@ -262,6 +276,10 @@ body{
     padding: 1rem;
     width: 100%;
 }
+.konfiguratorResults{
+    text-align: center;
+}
+.konfiguratorProductResults__item__title{ font-size: 70%; margin-top: .5rem; }
 .konfiguratorProductResults{
     display: flex;
     gap: 1rem;
@@ -306,8 +324,9 @@ body{
   }
 
 /*Defaultní nastavení každého selectoru*/
-.konfiguratorChangeable{
+.konfiguratorChangeable, .konfiguratorResults{
     position: relative;
+    margin: 3rem auto;
 }
 .konfiguratorChangeable h2{
     width: 100%;

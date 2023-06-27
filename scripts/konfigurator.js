@@ -85,103 +85,113 @@ function konfiguratorCreate(area, dataValues, theme){
             resultsTitle = theme[i].title;
             resultsArea = theme[i].id;
             resultsTooltip = theme[i].tooltip;
-            area.append("<div id=\""+resultsArea+"\"></div>");
+            area.append("<div id=\""+resultsArea+"\" class=\"konfiguratorResults\"></div>");
             showResults($("#"+resultsArea), resultsTitle, dataValues[0], false, 0, showEmptyResults);
         }
       }
 
-      area.html(area.html() + "<div class=\"konfiguratorChangeable konfiguratorPrice\"><h3>Cena za ks (s DPH): <span id=\"totalPrice\">"+dataValues[0]["cena"] * ($("#amount").length ? $("#amount").val() : 1)+"</span> Kč</h3></div>");
+      //Nastavení ceny
+      area.html(area.html() + "<div class=\"konfiguratorChangeable konfiguratorPrice\"><h3>Cena celkem (s DPH): <span id=\"totalPrice\">"+dataValues[0]["cena"] * ($("#amount").length ? $("#amount").val() : 1)+"</span> Kč</h3></div>");
 }
 //Nejzákladnější funkce volaná ze stránky
 function Konfigurator(URL, area){
-    $.getJSON(URL, function(dataValues){
-        /*
-            Vzhled našeho konfiguratoru - fce se nenachází zde
-        */
-        konfiguratorCreate(area, dataValues, createKonfigurator);
+    try{
+        $.getJSON(URL, function(dataValues){
+            /*
+                Vzhled našeho konfiguratoru - fce se nenachází zde
+            */
+            konfiguratorCreate(area, dataValues, createKonfigurator);
 
-        //Eventy
-        //Vyhledání nového produktu při zmeně jednoho z polí
-        $(window).ready(function(){
-            $(".konfiguratorData").each(function(){
-                $(this).unbind().on('change',function(){
-                    konfiguratorChange(dataValues);
+            //Eventy
+            //Vyhledání nového produktu při zmeně jednoho z polí
+            $(window).ready(function(){
+                $(".konfiguratorData").each(function(){
+                    $(this).unbind().on('change',function(){
+                        konfiguratorChange(dataValues);
+                    });
                 });
-            });
-            //Tooltip
-            $(".tooltip-toggle").each(function(){
-                $(this).unbind().click(function(){
-                    $(this).parent().find('.tooltip-toggle-bar').show();
+                //Tooltip
+                $(".tooltip-toggle").each(function(){
+                    $(this).unbind().click(function(){
+                        $(this).parent().find('.tooltip-toggle-bar').show();
+                    });
                 });
-            });
-            $(".tooltip-toggle-bar .close").each(function(){
-                $(this).unbind().click(function(){
-                    $(this).parent().parent().hide();
+                $(".tooltip-toggle-bar .close").each(function(){
+                    $(this).unbind().click(function(){
+                        $(this).parent().parent().hide();
+                    });
                 });
-            });
-            //Konfigurator final product view
-            $(".konfigurator__product--open").each(function(){
-                $(this).unbind().click(function(){
-                    $(this).parent().find('.konfigurator__product').toggleClass("show");
+                //Konfigurator final product view
+                $(".konfigurator__product--open").each(function(){
+                    $(this).unbind().click(function(){
+                        $(this).parent().find('.konfigurator__product').toggleClass("show");
+                    });
                 });
-            });
-            $(".konfigurator__product--close").each(function(){
-                $(this).unbind().click(function(){
-                    $(this).parent().toggleClass("show");
+                $(".konfigurator__product--close").each(function(){
+                    $(this).unbind().click(function(){
+                        $(this).parent().toggleClass("show");
+                    });
                 });
-            });
-            //Multiple select open
-            $("[data-selector]").each(function(){
-                $(this).unbind().click(function(){
-                    openMultipleSelectStack(this, $(this).attr("data-selector"));
+                $(".konfiguratorAmount").unbind().on("change", function(){
+                    //Nastavení ceny
+                    $("#totalPrice").html(parseInt($("#amount").val())*selectedProduct['cena']);
                 });
-            });
-            $(".removeOption").each(function(){
-                $(this).unbind().click(function(){
-                    changeValue(this);
-                    $('.selectedItem[data-change="'+$(this).attr("data-change")+'"]').removeClass('selectedItem');
+                //Multiple select open
+                $("[data-selector]").each(function(){
+                    $(this).unbind().click(function(){
+                        openMultipleSelectStack(this, $(this).attr("data-selector"));
+                    });
                 });
-            });
-            //item select
-            $(".singleSelectItem, .multipleSelectFromStackItem, .imageStackItem").each(function(){
-                $(this).unbind().click(function(){
-                    changeValue(this);
+                $(".removeOption").each(function(){
+                    $(this).unbind().click(function(){
+                        changeValue(this);
+                        $('.selectedItem[data-change="'+$(this).attr("data-change")+'"]').removeClass('selectedItem');
+                    });
                 });
-            });
-            //TextInput font size
-            $(".fontPlus").each(function(){
-                $(this).unbind().click(function(){
-                    addFontSize(this);
+                //item select
+                $(".singleSelectItem, .konfiguratorMultipleStackItem, .imageStackItem").each(function(){
+                    $(this).unbind().click(function(){
+                        changeValue(this);
+                    });
                 });
-            });
-            $(".fontMinus").each(function(){
-                $(this).unbind().click(function(){
-                    minusFontSize(this);
+                //TextInput font size
+                $(".fontPlus").each(function(){
+                    $(this).unbind().click(function(){
+                        addFontSize(this);
+                    });
                 });
-            });
-            $("#amount").unbind().on("change, input", function(){
-                $(this).attr("value", $(this).val());
-            });
-            //Aktivování range sliderů
-            $(".slider").each(function(){
-                let values = $(this).attr("data-values");
-                $(this).slider({
-                    min: 0,
-                    max: 100,
-                    //value: (100/values)*Math.floor(values/2),
-                    orientation: "vertical",
-                    step: 100/(values !== undefined ? values-1 : 1),
-                    slide: function(event, ui){
-                        $(this).find(".ui-slider-handle").attr("data-height", Math.round(ui.value)+"%");
-                        $(this).parent().parent().find("#"+$(this).attr("data-column")).val(Math.round(ui.value*((values-1)/100)));
-                        let konfiguratorColors = $(this).parent().find("> .konfiguratorBackground").attr("data-background").split(";");
-                        $(this).parent().find("> .konfiguratorBackground").css({"height": ui.value+"%", "background": "#"+konfiguratorColors[Math.round(ui.value*((values-1)/100)) % konfiguratorColors.length]});
-                        $(this).parent().parent().find("> #"+$(this).attr("data-column")).trigger("change");
-                    }
+                $(".fontMinus").each(function(){
+                    $(this).unbind().click(function(){
+                        minusFontSize(this);
+                    });
                 });
-            });
-        });   
-    });
+                $("#amount").unbind().on("change, input", function(){
+                    $(this).attr("value", $(this).val());
+                });
+                //Aktivování range sliderů
+                $(".slider").each(function(){
+                    let values = $(this).attr("data-values");
+                    $(this).slider({
+                        min: 0,
+                        max: 100,
+                        //value: (100/values)*Math.floor(values/2),
+                        orientation: "vertical",
+                        step: 100/(values !== undefined ? values-1 : 1),
+                        slide: function(event, ui){
+                            $(this).find(".ui-slider-handle").attr("data-height", Math.round(ui.value)+"%");
+                            $(this).parent().parent().find("#"+$(this).attr("data-column")).val(Math.round(ui.value*((values-1)/100)));
+                            let konfiguratorColors = $(this).parent().find("> .konfiguratorBackground").attr("data-background").split(";");
+                            $(this).parent().find("> .konfiguratorBackground").css({"height": ui.value+"%", "background": "#"+konfiguratorColors[Math.round(ui.value*((values-1)/100)) % konfiguratorColors.length]});
+                            $(this).parent().parent().find("> #"+$(this).attr("data-column")).trigger("change");
+                        }
+                    });
+                });
+            });   
+        });
+    }
+    catch(error){
+        console.error(error);
+    }
 }
 
 /*Change eventy*/
@@ -237,7 +247,7 @@ function changeValue(element){
         }
     }
     
-    $(element).parent().attr("data-selected", $(element).attr("data-values"));
+    $(element).parent().parent().attr("data-selected", $(element).attr("data-values"));
     $(element).parent().find(".selectedItem").removeClass("selectedItem");
     $(element).addClass("selectedItem");
     $("#"+$(element).attr("data-change")).val($(element).attr("data-values"));
@@ -255,9 +265,10 @@ function showResults(area, title, product, update, defaultValue, showNull = true
         finalProductGenerate(area, null, null, createKonfigurator[Object.keys(createKonfigurator).find(key => createKonfigurator[key].type=== "finalProduct")].etiquette, createKonfigurator[Object.keys(createKonfigurator).find(key => createKonfigurator[key].type=== "finalProduct")].items, createKonfigurator[Object.keys(createKonfigurator).find(key => createKonfigurator[key].type=== "finalProduct")].postToURL, true);
     }
     htmlInsert+="</div>";
-    htmlInsert+=tooltip(resultsTooltip);
+    htmlInsert+=tooltip(resultsTooltip, true);
 
-    $("#totalPrice").html(product["cena"]);
+    //Nastavení ceny
+    $("#totalPrice").html(product["cena"] * ($("#amount").length ? $("#amount").val() : 1));
 
     if(update === null || update === undefined || update === false) return area.html(area.html() + htmlInsert);
     else return area.html(htmlInsert);
@@ -267,7 +278,7 @@ function showResults(area, title, product, update, defaultValue, showNull = true
 /*Selectory*/
 //Amount
 function amountInput(area, title, className, toolTip = ""){
-    let htmlInsert = "<div class=\"konfiguratorAmount konfiguratorChangeable "+className+"\"><h2>"+title+"</h2><input type=\"number\" id=\"amount\" class=\"konfiguratorData\" min=\"1\" value=\"1\">"+tooltip(toolTip)+"</div>";
+    let htmlInsert = "<div class=\"konfiguratorAmount konfiguratorChangeable "+className+"\"><h2>"+title+"</h2><input type=\"number\" id=\"amount\" class=\"konfiguratorData konfiguratorPriceData\" min=\"1\" value=\"1\">"+tooltip(toolTip)+"</div>";
     area.html(area.html() + htmlInsert);
 }
 //Textový selektor
@@ -296,38 +307,38 @@ function minusFontSize(element){
 //Multiple selector
 function openMultipleSelectStack(element, column){
     $(element).parent().parent().parent().find(".selectedStackItem").removeClass("selectedStackItem");
-    $(".multipleSelectFromStack[data-column='"+column+"']").addClass("selectedStackItem");
+    $(".konfiguratorMultipleStack[data-column='"+column+"']").addClass("selectedStackItem");
 }
 function selectFromMultiple(area, data, columns, title, columnTitles, classNameArea, classNamesItems, images = false, itemTitles = [], repeat = false, toolTip=""){
-    let values = [], htmlInsert = "";
-    htmlInsert += "<div class=\"multipleSelectFrom "+classNameArea+" konfiguratorChangeable\"><h2>"+title+"</h2>";
-    htmlInsert += "<div class=\"multipleSelectFrom__selectors\">";
+    let values = [], htmlInsert = "<div class=\"konfiguratorMultiple konfiguratorChangeable "+classNameArea+"\">";
+    htmlInsert += "<div class=\""+classNameArea+"__area\"><h2>"+title+"</h2>";
+    htmlInsert += "<div class=\"konfiguratorMultiple__selectors\">";
     for(let i = 0; i < columns.length; i++){
         htmlInsert+="<div data-selector=\""+columns[i]+"\" class=\""+classNamesItems[i]+"__selector\"><img src=\"add.png\" alt=\"Obrázek\"><span class=\"selectorName\">";
         htmlInsert+=columnTitles[i];
         htmlInsert+="</span><span class=\"removeOption\" data-values=\"undefined\" data-change=\""+columns[i]+"\">Odstranit</a></div>";
     }
-    htmlInsert+=tooltip(toolTip);
     htmlInsert+="</div></div>";
 
     for(let i = 0; i < columns.length; i++){
-        htmlInsert += "<div class=\""+classNamesItems[i]+"__stack multipleSelectFrom__area\">";
+        htmlInsert += "<div class=\""+classNamesItems[i]+"__stack konfiguratorMultiple__area\">";
         values[i] = [];
         for(let item of data){
             if(item.produkt !== "0") values[i].push(item[columns[i]]);
         }
         values[i] = selectDistinct(values[i]);
 
-        htmlInsert+="<div data-column=\""+columns[i]+"\" data-repeat=\""+repeat+"\" class=\"konfigurator__multipleSelectFrom__stack multipleSelectFromStack "+(i === 0 ? "selectedStackItem" : "")+"\">";
+        htmlInsert+="<div data-column=\""+columns[i]+"\" data-repeat=\""+repeat+"\" class=\"konfigurator__konfiguratorMultiple__stack konfiguratorMultipleStack "+(i === 0 ? "selectedStackItem" : "")+"\">";
         for(let j = 0; j < values[i].length; j++){
-            htmlInsert+="<div class=\"multipleSelectFromStackItem"+(j === 0 ? " selectedItem" : "")+(values[i][j] === "undefined" ? " undefinedItem" : "")+"\" data-values=\""+values[i][j]+"\" data-change=\""+columns[i]+"\">"+(images === true ? "<div class=\"optionImage\"><img src=\"./"+values[i][j]+".png\" alt=\"Obrazek\"></div>": "")+"<p class=\"optionText\">"+(itemTitles === undefined || itemTitles[i] === undefined || itemTitles[i][j] === undefined ? values[i][j] : itemTitles[i][j])+"</p></div>";
+            htmlInsert+="<div class=\"konfiguratorMultipleStackItem"+(j === 0 ? " selectedItem" : "")+(values[i][j] === "undefined" ? " undefinedItem" : "")+"\" data-values=\""+values[i][j]+"\" data-change=\""+columns[i]+"\">"+(images === true && values[i][j] !== "undefined" ? "<div class=\"optionImage\"><img src=\"./"+values[i][j]+".png\" alt=\"Obrazek\"></div>": "")+"<p class=\"optionText\">"+(itemTitles === undefined || itemTitles[i] === undefined || itemTitles[i][j] === undefined ? values[i][j] : itemTitles[i][j])+"</p></div>";
         }
         htmlInsert+="</div>";
 
         htmlInsert += "<input type=\"hidden\" id=\""+columns[i]+"\" class=\"konfiguratorData multipleData\" value=\""+values[i][0]+"\">";
         htmlInsert += "</div>";
     }
-    htmlInsert += "</div>";
+    htmlInsert+=tooltip(toolTip);
+    htmlInsert += "</div></div>";
 
     return area.html(area.html() + htmlInsert);
 }
@@ -341,11 +352,11 @@ function selectFrom(area, data, column, title, className, images = false, itemTi
     values = selectDistinct(values);
     
     //Vytvoříme HTML kod
-    let htmlInsert = "<div class=\""+className+" konfiguratorChangeable\" data-selected=\""+values[0]+"\"><h2>"+title+"</h2>";
+    let htmlInsert = "<div class=\""+className+" konfiguratorChangeable konfiguratorSingle\" data-selected=\""+values[0]+"\"><h2>"+title+"</h2><div class=\"konfiguratorSingle__area\">";
     for(let i = 0; i < values.length; i++){
         htmlInsert+="<div class=\"singleSelectItem "+className+"__item "+(i == 0 ? "selectedItem" : "")+"\" data-change=\""+column+"\" data-values=\""+values[i]+"\">"+(images === true ? "<div class=\"optionImage\"><img src=\""+values[i]+".png\" alt=\"Obrazek možnosti\"></div>" : "") + "<p class=\"optionText\">"+(itemTitles === undefined || itemTitles[i] === undefined ? values[i] : itemTitles[i])+"</p></div>";
     }
-    htmlInsert+="<input type=\"hidden\" id=\""+column+"\" class=\"konfiguratorData\" value=\""+values[0]+"\">";
+    htmlInsert+="</div><input type=\"hidden\" id=\""+column+"\" class=\"konfiguratorData\" value=\""+values[0]+"\">";
     htmlInsert+=tooltip(toolTip);
     htmlInsert+="</div>";
 
@@ -361,7 +372,7 @@ function rangeFrom(area, data, column, title, desc, className, colors = ["00f"],
     values = selectDistinct(values);
 
     //Vytvoříme HTML kod + zapneme slider
-    let htmlInsert = "<div class=\""+className+" konfiguratorChangeable\"><h2>"+title+"</h2>";
+    let htmlInsert = "<div class=\"konfiguratorHorizontalRange "+className+" konfiguratorChangeable\"><h2>"+title+"</h2>";
     htmlInsert+=tooltip(toolTip);
     htmlInsert+="<div class=\"konfiguratorDescription\">"+desc+"</div>";
     htmlInsert+="<div class=\" konfiguratorRange\"><div class=\"konfiguratorBackground\" data-background=\""+colors.join(";")+"\" style=\"background: #"+(colors[1] !== undefined ? colors[1] : colors[0])+"\"></div><div data-column=\""+column+"\" class=\""+className+"__slider slider\" data-values=\""+values.length+"\"></div></div>";
@@ -376,13 +387,13 @@ function rangeFrom(area, data, column, title, desc, className, colors = ["00f"],
 function fullImageArea(area, columnName, title, className, defaultImages = [], toolTip = "", cropRatio = 8/9){
     let upload = uploadImage(className, columnName);
     let stack = selectImage(className, columnName, defaultImages);
-    let htmlInsert = "<div class=\"konfiguratorChangeable "+className+"\"><h2>"+title+"</h2>";
+    let htmlInsert = "<div class=\"konfiguratorImage konfiguratorChangeable "+className+"\"><h2>"+title+"</h2>";
     htmlInsert+=tooltip(toolTip);
     htmlInsert+=upload;
     htmlInsert+="<i>nebo si vyberte z předem nahraných...</i>";
     htmlInsert+=stack;
     htmlInsert+="</div>";
-    htmlInsert+="<button class=\"btn btn-primary\" onclick='editImage("+cropRatio+", \""+columnName+"\", \""+className+"\")'>Upravit obrázek</button>"
+    htmlInsert+="<button class=\"btn btn-primary editImage\" onclick='editImage("+cropRatio+", \""+columnName+"\", \""+className+"\")'>Upravit obrázek</button>"
 
     return area.html(area.html() + htmlInsert);
 }
@@ -457,13 +468,9 @@ function editImage(aspectRatio, columnName, fileStack){
     $("#konfiguratorModal").modal("show");
 }
 
-function showPrice(price){
-    return $("#totalPrice").html(price);
-}
-
 //Tooltip
-function tooltip(text){
-    return text.length ? "<div class=\"tooltip-toggle\">?</div><div class=\"tooltip-toggle-bar\"><div class=\"tooltip-toggle-bar__content\"><span class=\"close\">&times;</span><p class=\"tooltip-toggle-bar__content__text\">"+text+"<p></div></div>" : "";
+function tooltip(text, addEvent = false){
+    return text.length ? "<div class=\"tooltip-toggle\" "+(addEvent === true ? "onclick=\"$(this).parent().find('.tooltip-toggle-bar').show();\"" : "")+">?</div><div class=\"tooltip-toggle-bar\"><div class=\"tooltip-toggle-bar__content\"><span class=\"close\" "+(addEvent === true ? "onclick=\"$(this).parent().parent().hide();\"" : "")+">&times;</span><p class=\"tooltip-toggle-bar__content__text\">"+text+"<p></div></div>" : "";
 }
 
 /*Závěr*/
@@ -631,7 +638,7 @@ function wrapText(text, ctx, maxWidth){
                 ctx.drawImage(customPhoto, item.left+((areaSize-customPhoto.width*cropTo)/2), item.top+((areaSize-customPhoto.height*cropTo)/2), customPhoto.width*cropTo, customPhoto.height*cropTo);
               };
             }
-          }}, 50);
+          }}, 70);
   
           setTimeout(function(){
             if(finalProductURL !== null) URL.revokeObjectURL(finalProductURL);
