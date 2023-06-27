@@ -174,8 +174,9 @@
         margin: auto;
     }
 
-    .konfiguratorChangeable, .konfiguratorResults, button{
+    .konfiguratorChangeable, .konfiguratorResults{
         grid-column: 1 / span 3;
+        padding: 2rem 1rem;
     }
 
     .konfigurator__zaklad .konfiguratorSingle__area, .konfigurator__prisady .konfiguratorMultiple__selectors, .konfigurator__velikost .konfiguratorSingle__area {
