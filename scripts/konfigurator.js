@@ -136,6 +136,10 @@ function Konfigurator(URL, area){
                     //Nastavení ceny
                     $("#totalPrice").html(parseInt($("#amount").val())*selectedProduct['cena']);
                 });
+                $(".konfiguratorAmount").on("input", function(){
+                    //Nastavení ceny
+                    $("#totalPrice").html(parseInt($("#amount").val())*selectedProduct['cena']);
+                });
                 //Multiple select open
                 $("[data-selector]").each(function(){
                     $(this).unbind().click(function(){
@@ -164,9 +168,6 @@ function Konfigurator(URL, area){
                     $(this).unbind().click(function(){
                         minusFontSize(this);
                     });
-                });
-                $("#amount").unbind().on("change, input", function(){
-                    $(this).attr("value", $(this).val());
                 });
                 //Aktivování range sliderů
                 $(".slider").each(function(){

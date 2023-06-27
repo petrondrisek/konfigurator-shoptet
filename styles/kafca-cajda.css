@@ -12,9 +12,19 @@
     background: white;
 }
 
+.konfiguratorRange{
+    width: 163px;
+    height: 136px;
+}
+
+.ui-slider-vertical .ui-slider-handle, .ui-slider-vertical .ui-slider-handle.ui-state-hover{
+    transform: translateX(-85%);
+}
+
 .konfiguratorProductResults{
     width: 90%;
     justify-content: space-around;
+    flex-wrap: wrap;
 }
 
 .konfiguratorProductResults__item{
@@ -185,8 +195,13 @@
         margin: auto;
     }
 
-    .konfiguratorChangeable, .konfiguratorResults, button{
+    .konfiguratorChangeable, .konfiguratorResults{
         grid-column: 1 / span 3;
+        padding: 2rem 1rem;
+    }
+
+    .konfiguratorProductResults{
+        justify-content: center;
     }
 
     .konfigurator__velikost .konfiguratorSingle__area, .konfigurator__mleti .konfiguratorSingle__area {
