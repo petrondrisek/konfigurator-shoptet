@@ -675,6 +675,6 @@ function wrapText(text, ctx, maxWidth){
               $("#finalProduct").val(canvas.toDataURL("image/png"));
             });
             ctx.reset();
-          }, 100);
+          }, 1000);
       }
   }
