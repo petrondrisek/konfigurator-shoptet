@@ -618,7 +618,7 @@ function wrapText(text, ctx, maxWidth){
   
   function generateImage(area, product, etiquette, items){
       let background = new Image();
-      background.setAttribute('crossorigin', 'anonymous');
+      background.crossOrigin = 'Anonymous';
       background.src = etiquette["type"] === "staticImage" ? etiquette["image"] : product[etiquette["image"]];
       let canvas = null;
   
@@ -647,25 +647,25 @@ function wrapText(text, ctx, maxWidth){
             }
             else if(items[i].type === "image"){
               let item = items[i];
-              let customPhoto = new Image();
-              //customPhoto.setAttribute('crossorigin', 'anonymous');
-              customPhoto.src = $("#"+items[i].inputName).val();
-  
-              if(!customPhoto.complete) new Promise(resolve => setTimeout(resolve, 2000));
-
-              customPhoto.onload = function(){
-                let cropTo = 1;
-                if(customPhoto.height - item.height > customPhoto.width - item.width) cropTo = item.height/customPhoto.height;
-                else cropTo = item.width/customPhoto.width;
-  
-                let areaSize = 0;
-                if(item.adjustCropTo === "height") areaSize = item.height;
-                else areaSize = item.width;
-                ctx.beginPath();
-                ctx.drawImage(customPhoto, item.left+((areaSize-customPhoto.width*cropTo)/2), item.top+((areaSize-customPhoto.height*cropTo)/2), customPhoto.width*cropTo, customPhoto.height*cropTo);
-              };
-            }
-          }}, 70);
+              new Promise(resolve => {
+                let customPhoto = new Image();
+                customPhoto.crossOrigin = 'Anonymous';
+                customPhoto.src = $("#"+items[i].inputName).val();
+                customPhoto.onload = function(){
+                    let cropTo = 1;
+                    if(customPhoto.height - item.height > customPhoto.width - item.width) cropTo = item.height/customPhoto.height;
+                    else cropTo = item.width/customPhoto.width;
+    
+                    let areaSize = 0;
+                    if(item.adjustCropTo === "height") areaSize = item.height;
+                    else areaSize = item.width;
+                    ctx.beginPath();
+                    ctx.drawImage(customPhoto, item.left+((areaSize-customPhoto.width*cropTo)/2), item.top+((areaSize-customPhoto.height*cropTo)/2), customPhoto.width*cropTo, customPhoto.height*cropTo);
+                };
+                resolve(customPhoto);
+                });
+          }}
+        });
   
           setTimeout(function(){
             if(finalProductURL !== null) URL.revokeObjectURL(finalProductURL);
