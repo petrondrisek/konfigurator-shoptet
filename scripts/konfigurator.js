@@ -201,6 +201,16 @@ function Konfigurator(URL, area){
             if(postURL !== null) submitOrderEvent(postURL);
             else submitOrderAddToCart(selectedProduct["produkt"]);
         });
+        $(".konfiguratorModalOpen").each(function(){
+            $(this).unbind().click(function(){
+                $("#konfiguratorModal").fadeIn(500);
+            });
+        });
+        $(".konfiguratorModalClose").each(function(){
+            $(this).unbind().click(function(){
+                $("#konfiguratorModal").fadeOut(500);
+            });
+        });
     });
 }
 
@@ -405,7 +415,7 @@ function fullImageArea(area, columnName, title, className, defaultImages = [], t
     htmlInsert+="<i>nebo si vyberte z předem nahraných...</i>";
     htmlInsert+=stack;
     htmlInsert+="</div>";
-    htmlInsert+="<button class=\"btn btn-primary editImage\" onclick='editImage("+cropRatio+", \""+columnName+"\", \""+className+"\")'>Upravit obrázek</button>"
+    htmlInsert+="<button class=\"btn btn-primary editImage konfiguratorModalOpen\" onclick='editImage("+cropRatio+", \""+columnName+"\", \""+className+"\")'>Upravit obrázek</button>"
 
     return area.html(area.html() + htmlInsert);
 }
@@ -436,8 +446,8 @@ function addToFileStack(addTo, columnName, file){
 }
 //volaná určitým buttonem - není přímo základem
 function editImage(aspectRatio, columnName, fileStack){
-    $("#konfiguratorModal .modal-body").html("<img src=\""+$("#"+columnName).val()+"\" alt=\"Obrazek\" id=\"cropImage\"><div class=\"cropRotate\"></div>");
-    $("#konfiguratorModal .modal-footer").html("<button class=\"btn btn-primary\" id=\"saveCrop\">Uložit úpravu</button>");
+    $("#konfiguratorModal .konfiguratorModal__content__modal-body").html("<img src=\""+$("#"+columnName).val()+"\" alt=\"Obrazek\" id=\"cropImage\"><div class=\"cropRotate\"></div>");
+    $("#konfiguratorModal .konfiguratorModal__content__modal-footer").html("<button class=\"btn btn-primary\" id=\"saveCrop\">Uložit úpravu</button>");
 
     let cropper = new Cropper(document.querySelector("#cropImage"), {
         aspectRatio: aspectRatio,
@@ -457,7 +467,7 @@ function editImage(aspectRatio, columnName, fileStack){
             $("."+fileStack+"__stack").prepend("<div class=\""+fileStack+"__stack__item imageStackItem\" data-change=\""+columnName+"\" data-values=\""+createURL+"\" onclick=\"changeValue(this)\"><img src=\""+createURL+"\" alt=\"Obrazek\"></div>");
         
             $("[data-values='"+createURL+"']").trigger("click");
-            $("#konfiguratorModal").modal('hide');
+            $("#konfiguratorModal").fadeOut(500);
         });
         
     });
@@ -476,8 +486,6 @@ function editImage(aspectRatio, columnName, fileStack){
             $(this).find("span").html(ui.value);
         }
     });
-
-    $("#konfiguratorModal").modal("show");
 }
 
 //Tooltip
