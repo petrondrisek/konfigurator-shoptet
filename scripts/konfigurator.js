@@ -16,6 +16,9 @@ let resultsTooltip = "";
 //Náhled
 let finalProductURL = null;
 
+//url
+const url = "https://petrondrisek.github.io/konfigurator-shoptet/defaultImages";
+
 /*Pomocné funkce*/
 function startsWithInArray(array, find) {
     "use strict";
@@ -339,7 +342,7 @@ function selectFromMultiple(area, data, columns, title, columnTitles, classNameA
 
         htmlInsert+="<div data-column=\""+columns[i]+"\" data-repeat=\""+repeat+"\" class=\"konfigurator__konfiguratorMultiple__stack konfiguratorMultipleStack "+(i === 0 ? "selectedStackItem" : "")+"\">";
         for(let j = 0; j < values[i].length; j++){
-            htmlInsert+="<div class=\"konfiguratorMultipleStackItem"+(j === 0 ? " selectedItem" : "")+(values[i][j] === "undefined" ? " undefinedItem" : "")+"\" data-values=\""+values[i][j]+"\" data-change=\""+columns[i]+"\">"+(images === true && values[i][j] !== "undefined" ? "<div class=\"optionImage\"><img src=\"./"+values[i][j]+".png\" alt=\"Obrazek\"></div>": "")+"<p class=\"optionText\">"+(itemTitles === undefined || itemTitles[i] === undefined || itemTitles[i][j] === undefined ? values[i][j] : itemTitles[i][j])+"</p></div>";
+            htmlInsert+="<div class=\"konfiguratorMultipleStackItem"+(j === 0 ? " selectedItem" : "")+(values[i][j] === "undefined" ? " undefinedItem" : "")+"\" data-values=\""+values[i][j]+"\" data-change=\""+columns[i]+"\">"+(images === true && values[i][j] !== "undefined" ? "<div class=\"optionImage\"><img src=\""+url+"/"+values[i][j]+".png\" alt=\"Obrazek\"></div>": "")+"<p class=\"optionText\">"+(itemTitles === undefined || itemTitles[i] === undefined || itemTitles[i][j] === undefined ? values[i][j] : itemTitles[i][j])+"</p></div>";
         }
         htmlInsert+="</div>";
 
@@ -363,7 +366,7 @@ function selectFrom(area, data, column, title, className, images = false, itemTi
     //Vytvoříme HTML kod
     let htmlInsert = "<div class=\""+className+" konfiguratorChangeable konfiguratorSingle\" data-selected=\""+values[0]+"\"><h2>"+title+"</h2><div class=\"konfiguratorSingle__area\">";
     for(let i = 0; i < values.length; i++){
-        htmlInsert+="<div class=\"singleSelectItem "+className+"__item "+(i == 0 ? "selectedItem" : "")+"\" data-change=\""+column+"\" data-values=\""+values[i]+"\">"+(images === true ? "<div class=\"optionImage\"><img src=\""+values[i]+".png\" alt=\"Obrazek možnosti\"></div>" : "") + "<p class=\"optionText\">"+(itemTitles === undefined || itemTitles[i] === undefined ? values[i] : itemTitles[i])+"</p></div>";
+        htmlInsert+="<div class=\"singleSelectItem "+className+"__item "+(i == 0 ? "selectedItem" : "")+"\" data-change=\""+column+"\" data-values=\""+values[i]+"\">"+(images === true ? "<div class=\"optionImage\"><img src=\""+url+"/"+values[i]+".png\" alt=\"Obrazek možnosti\"></div>" : "") + "<p class=\"optionText\">"+(itemTitles === undefined || itemTitles[i] === undefined ? values[i] : itemTitles[i])+"</p></div>";
     }
     htmlInsert+="</div><input type=\"hidden\" id=\""+column+"\" class=\"konfiguratorData\" value=\""+values[0]+"\">";
     htmlInsert+=tooltip(toolTip);
