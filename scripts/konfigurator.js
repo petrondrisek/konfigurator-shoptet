@@ -247,9 +247,11 @@ function konfiguratorChange(data, showResultsView = true){
             $("#konfigurator").attr("productID", product);
             showResults($("#"+resultsArea), resultsTitle, data[product], true, 0, showEmptyResults);
             $(".konfigurator__product__content").removeClass("not-existing");
+            $(".orderSubmit").removeAttr("disabled");
         }else{
             $("#konfiguratorResults").html("<div class=\"resultNull\">Vybraným parametrům neodpovídá žádný produkt</div>");
             $(".konfigurator__product__content").addClass("not-existing");
+            $(".orderSubmit").attr("disabled", "true");
         }
     } else return product;
 }
