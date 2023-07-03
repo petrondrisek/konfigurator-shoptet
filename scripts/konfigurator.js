@@ -547,14 +547,10 @@ function submitOrderAddToCart(product){
         else {
             console.log("Přidávaný produkt do košíku: "+product);
             alert("Nejste na Shoptetu");
-            return false;
         }
-        blockSubmitting = false;
-        return true;
     } else {
         alert("Produkt, který přidávate do košíku neexistuje.");
     }
-    return false;
 }
 
 function submitOrderEvent(urlPost){
@@ -566,8 +562,8 @@ function submitOrderEvent(urlPost){
     formData.append("productPrice", selectedProduct["cena"]);
     
     //Vyřešení obrázku
-    if($("#"+$(this).attr("data-finalproduct")).length){
-    let blob = dataURLtoBlob($("#"+$(this).attr("data-finalproduct")).val());
+    if($(".konfigurator__product .konfiguratorData").length){
+    let blob = dataURLtoBlob($(".konfigurator__product .konfiguratorData").val());
     formData.append("file", blob, "image.png");
     formData.append("upload_file", true);
     }
