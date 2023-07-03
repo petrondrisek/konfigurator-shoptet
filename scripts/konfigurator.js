@@ -1,7 +1,10 @@
 /*jshint esversion: 6 */
 /*Pomocné proměnné*/
 let blockGenerating = false;
+let blockSubmitting = false;
 let selectedProduct = null;
+//Konfigurator nastavení
+var createKonfigurator = {};
 //Results
 let resultsColumns = [];
 let resultsTitles = [];
@@ -92,107 +95,110 @@ function konfiguratorCreate(area, dataValues, theme){
 
       //Nastavení ceny
       area.html(area.html() + "<div class=\"konfiguratorChangeable konfiguratorPrice\"><h3>Cena celkem (s DPH): <span id=\"totalPrice\">"+dataValues[0]["cena"] * ($("#amount").length ? $("#amount").val() : 1)+"</span> Kč</h3></div>");
+
+      //Přidání vložit do košíku
+      $(area).html($(area).html() + "<button id=\"addToCart\" class=\"orderSubmit btn btn-success\">Vložit do košíku</button>");
 }
 //Nejzákladnější funkce volaná ze stránky
 function Konfigurator(URL, area){
-    try{
-        $.getJSON(URL, function(dataValues){
-            /*
-                Vzhled našeho konfiguratoru - fce se nenachází zde
-            */
-            konfiguratorCreate(area, dataValues, createKonfigurator);
+    $.getJSON(URL, function(dataValues){
+        /*
+            Vzhled našeho konfiguratoru - fce se nenachází zde
+        */
+        createKonfigurator = dataValues.konfigurator;
+        konfiguratorCreate(area, dataValues.data, createKonfigurator);
 
-            //Eventy
-            //Vyhledání nového produktu při zmeně jednoho z polí
-            $(window).ready(function(){
-                $(".konfiguratorData").each(function(){
-                    $(this).unbind().on('change',function(){
-                        konfiguratorChange(dataValues);
-                    });
-                });
-                //Tooltip
-                $(".tooltip-toggle").each(function(){
-                    $(this).unbind().click(function(){
-                        $(this).parent().find('.tooltip-toggle-bar').show();
-                    });
-                });
-                $(".tooltip-toggle-bar .close").each(function(){
-                    $(this).unbind().click(function(){
-                        $(this).parent().parent().hide();
-                    });
-                });
-                //Konfigurator final product view
-                $(".konfigurator__product--open").each(function(){
-                    $(this).unbind().click(function(){
-                        $(this).parent().find('.konfigurator__product').toggleClass("show");
-                    });
-                });
-                $(".konfigurator__product--close").each(function(){
-                    $(this).unbind().click(function(){
-                        $(this).parent().toggleClass("show");
-                    });
-                });
-                $(".konfiguratorAmount").unbind().on("change", function(){
-                    //Nastavení ceny
-                    $("#totalPrice").html(parseInt($("#amount").val())*selectedProduct['cena']);
-                });
-                $(".konfiguratorAmount").on("input", function(){
-                    //Nastavení ceny
-                    $("#totalPrice").html(parseInt($("#amount").val())*selectedProduct['cena']);
-                });
-                //Multiple select open
-                $("[data-selector]").each(function(){
-                    $(this).unbind().click(function(){
-                        openMultipleSelectStack(this, $(this).attr("data-selector"));
-                    });
-                });
-                $(".removeOption").each(function(){
-                    $(this).unbind().click(function(){
-                        changeValue(this);
-                        $('.selectedItem[data-change="'+$(this).attr("data-change")+'"]').removeClass('selectedItem');
-                    });
-                });
-                //item select
-                $(".singleSelectItem, .konfiguratorMultipleStackItem, .imageStackItem").each(function(){
-                    $(this).unbind().click(function(){
-                        changeValue(this);
-                    });
-                });
-                //TextInput font size
-                $(".fontPlus").each(function(){
-                    $(this).unbind().click(function(){
-                        addFontSize(this);
-                    });
-                });
-                $(".fontMinus").each(function(){
-                    $(this).unbind().click(function(){
-                        minusFontSize(this);
-                    });
-                });
-                //Aktivování range sliderů
-                $(".slider").each(function(){
-                    let values = $(this).attr("data-values");
-                    $(this).slider({
-                        min: 0,
-                        max: 100,
-                        //value: (100/values)*Math.floor(values/2),
-                        orientation: "vertical",
-                        step: 100/(values !== undefined ? values-1 : 1),
-                        slide: function(event, ui){
-                            $(this).find(".ui-slider-handle").attr("data-height", Math.round(ui.value)+"%");
-                            $(this).parent().parent().find("#"+$(this).attr("data-column")).val(Math.round(ui.value*((values-1)/100)));
-                            let konfiguratorColors = $(this).parent().find("> .konfiguratorBackground").attr("data-background").split(";");
-                            $(this).parent().find("> .konfiguratorBackground").css({"height": ui.value+"%", "background": "#"+konfiguratorColors[Math.round(ui.value*((values-1)/100)) % konfiguratorColors.length]});
-                            $(this).parent().parent().find("> #"+$(this).attr("data-column")).trigger("change");
-                        }
-                    });
-                });
-            });   
+        //Eventy
+        //Vyhledání nového produktu při zmeně jednoho z polí
+        $(".konfiguratorData").each(function(){
+            $(this).unbind().on('change',function(){
+                konfiguratorChange(dataValues.data);
+            });
         });
-    }
-    catch(error){
-        console.error(error);
-    }
+        //Tooltip
+        $(".tooltip-toggle").each(function(){
+            $(this).unbind().click(function(){
+                $(this).parent().find('.tooltip-toggle-bar').show();
+            });
+        });
+        $(".tooltip-toggle-bar .close").each(function(){
+            $(this).unbind().click(function(){
+                $(this).parent().parent().hide();
+            });
+        });
+        //Konfigurator final product view
+        $(".konfigurator__product--open").each(function(){
+            $(this).unbind().click(function(){
+                $(this).parent().find('.konfigurator__product').toggleClass("show");
+            });
+        });
+        $(".konfigurator__product--close").each(function(){
+            $(this).unbind().click(function(){
+                $(this).parent().toggleClass("show");
+            });
+        });
+        $(".konfiguratorAmount").unbind().on("change", function(){
+            //Nastavení ceny
+            $("#totalPrice").html(parseInt($("#amount").val())*selectedProduct['cena']);
+        });
+        $(".konfiguratorAmount").on("input", function(){
+            //Nastavení ceny
+            if(parseInt($("#amount").val()) < 1) $("#amount").val(1);
+            $("#totalPrice").html(parseInt($("#amount").val())*selectedProduct['cena']);
+        });
+        //Multiple select open
+        $("[data-selector]").each(function(){
+            $(this).unbind().click(function(){
+                openMultipleSelectStack(this, $(this).attr("data-selector"));
+            });
+        });
+        $(".removeOption").each(function(){
+            $(this).unbind().click(function(){
+                changeValue(this);
+                $('.selectedItem[data-change="'+$(this).attr("data-change")+'"]').removeClass('selectedItem');
+            });
+        });
+        //item select
+        $(".singleSelectItem, .konfiguratorMultipleStackItem, .imageStackItem").each(function(){
+            $(this).unbind().click(function(){
+                changeValue(this);
+            });
+        });
+        //TextInput font size
+        $(".fontPlus").each(function(){
+            $(this).unbind().click(function(){
+                addFontSize(this);
+            });
+        });
+        $(".fontMinus").each(function(){
+            $(this).unbind().click(function(){
+                minusFontSize(this);
+            });
+        });
+        //Aktivování range sliderů
+        $(".slider").each(function(){
+            let values = $(this).attr("data-values");
+            $(this).slider({
+                min: 0,
+                max: 100,
+                //value: (100/values)*Math.floor(values/2),
+                orientation: "vertical",
+                step: 100/(values !== undefined ? values-1 : 1),
+                slide: function(event, ui){
+                    $(this).find(".ui-slider-handle").attr("data-height", Math.round(ui.value)+"%");
+                    $(this).parent().parent().find("#"+$(this).attr("data-column")).val(Math.round(ui.value*((values-1)/100)));
+                    let konfiguratorColors = $(this).parent().find("> .konfiguratorBackground").attr("data-background").split(";");
+                    $(this).parent().find("> .konfiguratorBackground").css({"height": ui.value+"%", "background": "#"+konfiguratorColors[Math.round(ui.value*((values-1)/100)) % konfiguratorColors.length]});
+                    $(this).parent().parent().find("> #"+$(this).attr("data-column")).trigger("change");
+                }
+            });
+        });
+        $("#addToCart").click(function(){
+            let postURL = createKonfigurator[Object.keys(createKonfigurator).find(key => createKonfigurator[key].type=== "finalProduct")].postToURL;
+            if(postURL !== null) submitOrderEvent(postURL);
+            else submitOrderAddToCart(selectedProduct["produkt"]);
+        });
+    });
 }
 
 /*Change eventy*/
@@ -227,8 +233,10 @@ function konfiguratorChange(data, showResultsView = true){
         if(product >= 0 && data[product].produkt !== "0"){
             $("#konfigurator").attr("productID", product);
             showResults($("#"+resultsArea), resultsTitle, data[product], true, 0, showEmptyResults);
+            $(".konfigurator__product__content").removeClass("not-existing");
         }else{
             $("#konfiguratorResults").html("<div class=\"resultNull\">Vybraným parametrům neodpovídá žádný produkt</div>");
+            $(".konfigurator__product__content").addClass("not-existing");
         }
     } else return product;
 }
@@ -475,14 +483,11 @@ function tooltip(text, addEvent = false){
 }
 
 /*Závěr*/
-function finalProductGenerate(area, id, backgroundImage, etiquette, items, urlPost, update = false){
-    if(id !== null && $("[data-finalProduct=\""+id+"\"]").length === 0) $(area).html($(area).html() + "<button data-finalProduct=\""+id+"\" class=\"orderSubmit btn btn-success\">Vložit do košíku</button>");
-    submitOrderEvent(urlPost);
+function finalProductGenerate(area, id, backgroundImage, etiquette, items, urlPost = "", update = false){
     let htmlInsert = "";
-    
     if(update === false){
         if(etiquette){
-            htmlInsert += "<div class=\"konfigurator__product--open\">&#8594;</div><div class=\"konfigurator__product\"><div class=\"konfigurator__product--close\">&times;</div><input type=\"hidden\" id=\"finalProduct\" class=\"konfiguratorData\" value=\""+etiquette.image+"\"><div class=\"konfigurator__product__content\"><img src=\""+backgroundImage+"\" class=\"product__background\" alt=\"Produkt\"><img src=\""+etiquette.image+"\" onerror='this.src=\"../defaultImages/loading.gif\"' width=\"266px\" alt=\"Etiketa\" class=\""+etiquette.className+"\"></div></div>";
+            htmlInsert += "<div class=\"konfigurator__product--open\">&#8594;</div><div class=\"konfigurator__product\"><div class=\"konfigurator__product--close\">&times;</div><input type=\"hidden\" id=\"finalProduct\" class=\"konfiguratorData\" value=\""+etiquette.image+"\"><div class=\"konfigurator__product__content\"><img src=\""+backgroundImage+"\" class=\"konfigurator__product__background\" alt=\"Produkt\"><img src=\""+etiquette.image+"\" onerror='this.src=\"../defaultImages/loading.gif\"' width=\"266px\" alt=\"Etiketa\" class=\"konfigurator__product__etiquette "+etiquette.className+"\"></div></div>";
             if(blockGenerating === false){
                 blockGenerating = true;
                 $(".konfigurator__product__content").addClass("loading");
@@ -525,37 +530,51 @@ function finalProductGenerate(area, id, backgroundImage, etiquette, items, urlPo
     }
 }
 
-function submitOrderEvent(urlPost){
-    $(".orderSubmit").unbind().click(function(){
-        let formData = new FormData();
-        $(".konfiguratorData").each(function(){
-          formData.append($(this).attr("id"), $(this).val());
-        });
-
-        formData.append("productCode", selectedProduct["produkt"]);
-        formData.append("productPrice", selectedProduct["cena"]);
-        
-        //Vyřešení obrázku
-        if($("#"+$(this).attr("data-finalproduct")).length){
-          let blob = dataURLtoBlob($("#"+$(this).attr("data-finalproduct")).val());
-          formData.append("file", blob, "image.png");
-          formData.append("upload_file", true);
+function submitOrderAddToCart(product){
+    if(product !== undefined && product !== null && product !== ""){
+        if(typeof(shoptet) !== 'undefined') shoptet.cartShared.addToCart({productCode: product, amount: $("#amount").length ? parseInt($("#amount").val()) : 1});
+        else {
+            console.log("Přidávaný produkt do košíku: "+product);
+            alert("Nejste na Shoptetu");
+            return false;
         }
+        blockSubmitting = false;
+        return true;
+    } else {
+        alert("Produkt, který přidávate do košíku neexistuje.");
+    }
+    return false;
+}
 
-        $.ajax({
-          type: "POST",
-          data: formData,
-          contentType: false,
-          processData: false,
-          url: urlPost,
-          success: function(data){
-            console.log(data);
-          },
-          error: function(req, error){
+function submitOrderEvent(urlPost){
+    let formData = new FormData();
+    $(".konfiguratorData").each(function(){
+    formData.append($(this).attr("id"), $(this).val());
+    });
+    formData.append("productCode", selectedProduct["produkt"]);
+    formData.append("productPrice", selectedProduct["cena"]);
+    
+    //Vyřešení obrázku
+    if($("#"+$(this).attr("data-finalproduct")).length){
+    let blob = dataURLtoBlob($("#"+$(this).attr("data-finalproduct")).val());
+    formData.append("file", blob, "image.png");
+    formData.append("upload_file", true);
+    }
+
+    $.ajax({
+        type: "POST",
+        data: formData,
+        contentType: false,
+        processData: false,
+        url: urlPost,
+        success: function(data){
+            submitOrderAddToCart(data.productCode);
+        },
+        error: function(req, error){
             console.error(error);
-          }
-        });
-      });
+            blockSubmitting = false;
+        }
+    });
 }
 
 
@@ -627,6 +646,8 @@ function wrapText(text, ctx, maxWidth){
               let customPhoto = new Image();
               customPhoto.src = $("#"+items[i].inputName).val();
   
+              if(!customPhoto.complete) new Promise(resolve => setTimeout(resolve, 2000));
+
               customPhoto.onload = function(){
                 let cropTo = 1;
                 if(customPhoto.height - item.height > customPhoto.width - item.width) cropTo = item.height/customPhoto.height;

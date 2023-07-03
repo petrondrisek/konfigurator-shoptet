@@ -11,9 +11,57 @@ body{
     background: #f4f4f4;
 }
 
+.konfigurator__product{
+    grid-row: 1 / 5;
+    grid-column: 3;
+    position: relative;
+    height: 608px;
+}
+
+.konfigurator__product__content{
+    height: 608px;
+    width: 377px;
+    overflow: hidden;
+    position: relative;
+}
+
+.konfigurator__product__etiquette{
+    position: absolute;
+    right: 50%;
+    top: 50%;
+    transform: translate(50%, -50%);
+}
+
+.konfigurator__product--open, .konfigurator__product--close{
+    display: none;
+}
+
 .loading::after{
     content: "Načítání...";
     font-size: 3rem;
+    font-weight: bold;
+    text-align: center;
+    line-height: 600px;
+    display: block;
+    position: absolute;
+    top: 0;
+    z-index: 101;
+    left: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    color: black;
+    background: rgba(255, 255, 255, .5);
+}
+
+.not-existing.loading::after{
+    display: none;
+}
+
+.not-existing::after{
+    display: block !important;
+    content: "Neexistující varianta";
+    font-size: 2rem;
     font-weight: bold;
     text-align: center;
     line-height: 600px;
@@ -362,5 +410,72 @@ body{
 }
 
 @media only screen and (max-width: 1200px){
+    .konfigurator__product{
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: white;
+        z-index: 100;
+        display: none;
+    }
+
+    .konfigurator__product.show{
+        display: block;
+    }
+
+    .konfigurator__product--open, .konfigurator__product--close{
+        display: block;
+    }
+
+    .konfigurator__product--open{
+        position: fixed;
+        z-index: 99;
+        right: 1rem;
+        bottom: 1rem;
+        font-size: 2rem;
+        font-weight: bold;
+        background: #404040;
+        color: white;
+        width: 2rem;
+        height: 2rem;
+        line-height: 1.8rem;
+        text-align: center;
+        border-radius: 100%;
+        cursor: pointer;
+    }
+
+    .konfigurator__product--close{
+        position: absolute;
+        right: 1rem;
+        top: 1rem;
+        font-size: 2rem;
+        font-weight: bold;
+        z-index: 101;
+        background: #404040;
+        color: white;
+        width: 2rem;
+        height: 2rem;
+        line-height: 1.8rem;
+        text-align: center;
+        border-radius: 100%;
+        cursor: pointer;
+    }
+
+    .konfigurator__product__content{
+        margin: auto;
+        width: 300px;
+        height: 483.82px;
+    }
+
+    .konfigurator__product__background{
+        width: 100%;
+    }
+
+    .konfigurator__product__etiquette{
+        width: 212.135px;
+    }
+
     .imageStack{ width: 80vw; }
 }
