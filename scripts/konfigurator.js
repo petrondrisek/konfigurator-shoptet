@@ -213,9 +213,9 @@ function konfiguratorChange(data, showResultsView = true){
     const htmlDoc = parser.parseFromString(body, 'text/html');
     let konfiguratorData = $(htmlDoc).find(".konfiguratorData");
     
-    for(let i of konfiguratorData){
-        keys.push($(i).attr("id"));
-        values.push($(i).attr("value"));
+    for(let i = 0; i < konfiguratorData.length; i++){
+        keys.push($(konfiguratorData[i]).attr("id"));
+        values.push($(konfiguratorData[i]).attr("value"));
     }
 
     let product = -1;
