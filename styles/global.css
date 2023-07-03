@@ -25,6 +25,8 @@ body{
     display: none;
   }
   .konfiguratorModal__content{
+    display: block;
+    overflow: auto;
     width: 50%;
     min-height: 30%;
     max-height: 80%;
@@ -33,6 +35,14 @@ body{
     border: 1px solid #ccc;
     position: relative;
     padding: 3rem 1rem 1rem;
+  }
+
+  .konfiguratorModal__content__modal-body{
+    max-height: 80%;
+  }
+
+  .konfiguratorModal__content__modal-body img{
+    max-height:100%;
   }
 
   .konfiguratorModal__content .konfiguratorModalClose{
@@ -275,9 +285,9 @@ body{
 }
 .imageStack{
     display: flex;
-    gap: 1rem;
+    gap: .5rem;
     width: 100%;
-    height: 10rem;
+    height: 12rem;
     background: #ddd;
     overflow-x: auto;
     overflow-y: hidden;
@@ -302,6 +312,7 @@ body{
     margin-top: 1rem;
 }
 .imageStackSelect{
+    overflow-x: auto;
     display: flex;
 }
 

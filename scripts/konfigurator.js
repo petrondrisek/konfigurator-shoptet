@@ -1,7 +1,6 @@
 /*jshint esversion: 6 */
 /*Pomocné proměnné*/
 let blockGenerating = false;
-let blockSubmitting = false;
 let selectedProduct = null;
 //Konfigurator nastavení
 var createKonfigurator = {};
@@ -14,6 +13,7 @@ let resultsTitle = "";
 let resultsArea = "";
 let resultsTooltip = "";
 //Náhled
+let saveLastBlob = [];
 let finalProductURL = null;
 
 //url
@@ -563,8 +563,7 @@ function submitOrderEvent(urlPost){
     
     //Vyřešení obrázku
     if($(".konfigurator__product .konfiguratorData").length){
-    let blob = dataURLtoBlob($(".konfigurator__product .konfiguratorData").val());
-    formData.append("file", blob, "image.png");
+    formData.append("file", saveLastBlob, "image.png");
     formData.append("upload_file", true);
     }
 
@@ -573,30 +572,19 @@ function submitOrderEvent(urlPost){
         data: formData,
         contentType: false,
         processData: false,
+        cache: false,
         url: urlPost,
         success: function(data){
             submitOrderAddToCart(data.productCode);
         },
         error: function(req, error){
             console.error(error);
-            blockSubmitting = false;
         }
     });
 }
 
 
 /* Odeslání objednávky do košíku */
-//Vytvoři z BLOB obrázku File
-function dataURLtoBlob(dataurl) {
-    var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
-        bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
-    while(n--){
-        u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new Blob([u8arr], {type:mime});
-}
-
-
 //Generátor náhledu
 function wrapText(text, ctx, maxWidth){
     let linesStatic = text.split("<br>");
@@ -629,7 +617,7 @@ function wrapText(text, ctx, maxWidth){
       background.onload = function(){
         if(!$("#canvas").length) area.append("<canvas id=\"canvas\" width=\""+background.width+"\" height=\""+background.height+"\" style=\"display:none\"></canvas>")
         canvas = document.getElementById("canvas");
-        const ctx = canvas.getContext("2d");
+        const ctx = canvas.getContext("2d", {preserveDrawingBuffer:true});
         ctx.drawImage(background,0,0);
         setTimeout(function(){
             for(i in items){
@@ -667,16 +655,17 @@ function wrapText(text, ctx, maxWidth){
                     ctx.drawImage(customPhoto, item.left+((areaSize-customPhoto.width*cropTo)/2), item.top+((areaSize-customPhoto.height*cropTo)/2), customPhoto.width*cropTo, customPhoto.height*cropTo);
                 };
                 resolve(customPhoto);
-                });
+                }, 500);
           }}
         });
   
           setTimeout(function(){
             if(finalProductURL !== null) URL.revokeObjectURL(finalProductURL);
             canvas.toBlob((blob) => {
+              saveLastBlob = blob;
               finalProductURL = URL.createObjectURL(blob);
               $(".product__etiketa").attr({"src": finalProductURL, width: etiquette.finalRenderWidth+"px"});
-              $("#finalProduct").val(canvas.toDataURL("image/png"));
+              $("#finalProduct").val(finalProductURL);
             });
             ctx.reset();
           }, 1000);
