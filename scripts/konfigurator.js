@@ -618,6 +618,7 @@ function wrapText(text, ctx, maxWidth){
   
   function generateImage(area, product, etiquette, items){
       let background = new Image();
+      background.setAttribute('crossorigin', 'anonymous');
       background.src = etiquette["type"] === "staticImage" ? etiquette["image"] : product[etiquette["image"]];
       let canvas = null;
   
@@ -647,6 +648,7 @@ function wrapText(text, ctx, maxWidth){
             else if(items[i].type === "image"){
               let item = items[i];
               let customPhoto = new Image();
+              customPhoto.setAttribute('crossorigin', 'anonymous');
               customPhoto.src = $("#"+items[i].inputName).val();
   
               if(!customPhoto.complete) new Promise(resolve => setTimeout(resolve, 2000));
